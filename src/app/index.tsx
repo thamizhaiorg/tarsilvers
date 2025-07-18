@@ -22,9 +22,7 @@ import MetafieldsSystem from "../components/metafields-system";
 import Locations from "../components/locations";
 import ItemsScreen from "../components/items";
 import FilesScreen from "../components/files";
-// People screen removed
-
-// Storefront screen removed
+import ProfileScreen from "../screens/profile";
 
 import { MainScreen } from "../components/nav";
 
@@ -402,9 +400,7 @@ export default function Page() {
         />;
 
       case 'profile':
-        // Profile screen removed - redirect to menu
-        handleNavigate('menu');
-        return null;
+        return <ProfileScreen onClose={() => handleNavigate('menu')} />;
 
 
 
