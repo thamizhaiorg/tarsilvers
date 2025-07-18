@@ -135,10 +135,7 @@ export default function OptionSetEditScreen({ setId, setName, onClose }: OptionS
   const handleSave = async () => {
     const trimmedSetName = currentSetName.trim();
     
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'No store selected');
-      return;
-    }
+
     
     if (!trimmedSetName) {
       Alert.alert('Error', 'Option set name cannot be empty');

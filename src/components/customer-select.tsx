@@ -73,11 +73,7 @@ export default function CustomerSelect({ selectedCustomer, onCustomerSelect, onC
       return;
     }
 
-    if (!currentStore?.id) {
-      hapticFeedback.error();
-      Alert.alert('Error', 'Please select a store first');
-      return;
-    }
+
 
     setIsAddingCustomer(true);
     try {

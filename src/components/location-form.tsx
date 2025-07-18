@@ -78,10 +78,7 @@ export default function LocationForm({ location, onClose, onSave }: LocationForm
       return;
     }
 
-    if (!currentStore) {
-      Alert.alert('Error', 'No store selected');
-      return;
-    }
+
 
     try {
       setLoading(true);

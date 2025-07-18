@@ -93,10 +93,6 @@ export default function TypeSelect({ selectedType, onSelect, onClose }: TypeSele
 
   const handleAddType = async () => {
     if (!searchQuery.trim()) return;
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'Please select a store first');
-      return;
-    }
 
     // Check if type already exists
     const existingType = types.find(t =>

@@ -179,10 +179,6 @@ export default function Metafields({ productId, onClose, showHeader = true }: Me
   };
 
   const deleteGroup = async (groupName: string) => {
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'No store selected');
-      return;
-    }
 
     try {
       // Delete all metafields in this group
@@ -200,11 +196,6 @@ export default function Metafields({ productId, onClose, showHeader = true }: Me
   };
 
   const deleteMetafield = async (metafieldId: string) => {
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'No store selected');
-      return;
-    }
-
     try {
       await db.transact(db.tx.metasets[metafieldId].delete());
     } catch (error) {
@@ -223,10 +214,7 @@ export default function Metafields({ productId, onClose, showHeader = true }: Me
       return;
     }
 
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'No store selected');
-      return;
-    }
+
 
     try {
       const definitionId = id();

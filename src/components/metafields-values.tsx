@@ -121,10 +121,6 @@ export default function MetafieldValues({
   }, [valuesData, entityType]);
 
   const saveValue = async (setId: string, value: string) => {
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'No store selected');
-      return;
-    }
 
     try {
       const definition = definitions.find(d => d.id === setId);
@@ -158,11 +154,6 @@ export default function MetafieldValues({
   };
 
   const deleteValue = async (valueId: string) => {
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'No store selected');
-      return;
-    }
-
     try {
       await db.transact(db.tx.metavalues[valueId].delete());
     } catch (error) {

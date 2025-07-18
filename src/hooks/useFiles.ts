@@ -80,10 +80,6 @@ export function useFiles(options: UseFilesOptions = {}): UseFilesResult {
     file: any,
     uploadOptions: { reference?: string; title?: string; alt?: string } = {}
   ) => {
-    if (!currentStore) {
-      return { success: false, error: 'No store selected' };
-    }
-
     if (!user) {
       return { success: false, error: 'User must be authenticated to upload files' };
     }
@@ -106,10 +102,6 @@ export function useFiles(options: UseFilesOptions = {}): UseFilesResult {
     newFile: any,
     replaceOptions: { reference?: string; title?: string; alt?: string } = {}
   ) => {
-    if (!currentStore) {
-      return { success: false, error: 'No store selected' };
-    }
-
     if (!user) {
       return { success: false, error: 'User must be authenticated to replace files' };
     }

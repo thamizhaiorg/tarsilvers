@@ -97,10 +97,6 @@ export default function CollectionSelect({ selectedCollection, onSelect, onClose
 
   const handleAddCollection = async () => {
     if (!searchQuery.trim()) return;
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'Please select a store first');
-      return;
-    }
 
     const existingCollection = collections.find(c =>
       c.name?.toLowerCase() === searchQuery.trim().toLowerCase()

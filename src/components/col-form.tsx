@@ -47,7 +47,7 @@ export default function CollectionFormScreen({ collection, onClose, onSave }: Co
     description: collection?.description || '',
     image: collection?.image || '',
     isActive: collection?.isActive ?? true,
-    storefront: collection?.storefront ?? true,
+    // storefront field removed
     pos: collection?.pos ?? true,
   });
 
@@ -102,10 +102,7 @@ export default function CollectionFormScreen({ collection, onClose, onSave }: Co
       return;
     }
 
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'No store selected');
-      return;
-    }
+
 
     // Check for duplicate collection names (only for new collections)
     if (!isEditing) {
@@ -133,7 +130,7 @@ export default function CollectionFormScreen({ collection, onClose, onSave }: Co
         description: formData.description.trim(),
         image: formData.image,
         isActive: formData.isActive,
-        storefront: formData.storefront,
+        // storefront field removed
         pos: formData.pos,
         storeId: currentStore.id, // Required field that was missing
         updatedAt: timestamp,
@@ -344,40 +341,7 @@ export default function CollectionFormScreen({ collection, onClose, onSave }: Co
             </TouchableOpacity>
           </View>
 
-          {/* Storefront Toggle */}
-          <View style={{
-            flexDirection: 'row',
-            backgroundColor: '#fff',
-            paddingHorizontal: 16,
-            paddingVertical: 16,
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            borderBottomWidth: 1,
-            borderColor: '#E5E7EB',
-          }}>
-            <Text style={{ fontSize: 16, fontWeight: '500', color: '#111827' }}>
-              Available on Storefront
-            </Text>
-            <TouchableOpacity
-              onPress={() => updateField('storefront', !formData.storefront)}
-              style={{
-                width: 48,
-                height: 28,
-                borderRadius: 14,
-                backgroundColor: formData.storefront ? '#10B981' : '#D1D5DB',
-                justifyContent: 'center',
-                paddingHorizontal: 2,
-              }}
-            >
-              <View style={{
-                width: 24,
-                height: 24,
-                borderRadius: 12,
-                backgroundColor: '#fff',
-                alignSelf: formData.storefront ? 'flex-end' : 'flex-start',
-              }} />
-            </TouchableOpacity>
-          </View>
+          {/* Storefront toggle removed */}
 
           {/* POS Toggle */}
           <View style={{

@@ -7,9 +7,7 @@ export type MetafieldEntityType =
   | 'customers' 
   | 'orders' 
   | 'draft_orders' 
-  | 'locations' 
-  | 'pages' 
-  | 'blogs';
+  | 'locations';
 
 export interface MetafieldSet {
   id: string;
@@ -58,6 +56,4 @@ export const METAFIELD_CATEGORIES = [
   { id: 'orders', name: 'Orders' },
   { id: 'draft_orders', name: 'Draft orders' },
   { id: 'locations', name: 'Locations' },
-  { id: 'pages', name: 'Pages' },
-  { id: 'blogs', name: 'Blogs' },
 ] as const;

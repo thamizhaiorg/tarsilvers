@@ -208,10 +208,6 @@ export default function SquarePOS({ onClose, onOrderCreated }: SquarePOSProps) {
   };
 
   const processPayment = async (paymentMethod: 'cash' | 'card') => {
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'Please select a store first');
-      return;
-    }
 
     setIsProcessing(true);
     try {

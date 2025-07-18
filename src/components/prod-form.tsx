@@ -1219,10 +1219,7 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
       return;
     }
 
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'Please select a store first');
-      return;
-    }
+
 
     setLoading(true);
     log.info(`Starting product save: ${isEditing ? 'edit' : 'create'}`, 'ProductForm', {

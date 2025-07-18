@@ -90,10 +90,6 @@ export default function MetafieldDefinitions({
   }, [metafieldsData, entityType]);
 
   const addDefinition = async (definitionData: Partial<MetafieldSet>) => {
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'No store selected');
-      return;
-    }
 
     if (!definitionData.name?.trim()) {
       Alert.alert('Error', 'Name is required');
@@ -133,11 +129,6 @@ export default function MetafieldDefinitions({
   };
 
   const deleteDefinition = async (definitionId: string) => {
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'No store selected');
-      return;
-    }
-
     try {
       await db.transact(db.tx.metasets[definitionId].delete());
     } catch (error) {
@@ -146,11 +137,6 @@ export default function MetafieldDefinitions({
   };
 
   const deleteGroup = async (groupName: string) => {
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'No store selected');
-      return;
-    }
-
     try {
       const groupDefinitions = definitions.filter(def => def.name === groupName);
       const deleteTransactions = groupDefinitions.map(def =>

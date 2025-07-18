@@ -3,9 +3,8 @@
 import { i } from "@instantdb/react-native";
 
 const _schema = i.schema({
-  // We inferred 15 attributes!
-  // Take a look at this schema, and if everything looks good,
-  // run `push schema` again to enforce the types.
+  // SKJ Silversmith - Single Store POS Schema
+  // Optimized for single-store commerce operations
   entities: {
     $files: i.entity({
       path: i.string().unique().indexed(),
@@ -14,20 +13,9 @@ const _schema = i.schema({
     $users: i.entity({
       email: i.string().unique().indexed().optional(),
     }),
-    blocks: i.entity({
-      content: i.json().optional(),
-      createdAt: i.date().optional(),
-      order: i.number().optional(),
-      pageId: i.string().indexed().optional(),
-      storeId: i.string().indexed().optional(),
-      style: i.json().optional(),
-      type: i.string().indexed().optional(),
-      updatedAt: i.date().optional(),
-      visible: i.boolean().optional(),
-    }),
+    // blocks entity removed - storefront related
     brands: i.entity({
       name: i.string().unique().indexed(),
-      storeId: i.string().indexed(),
     }),
     cart: i.entity({
       createdAt: i.date(),
@@ -38,7 +26,6 @@ const _schema = i.schema({
       quantity: i.number(),
       sessionId: i.string().indexed().optional(),
       sku: i.string().optional(),
-      storeId: i.string().indexed(),
       title: i.string(),
       updatedAt: i.date().optional(),
       userId: i.string().indexed().optional(),
@@ -47,7 +34,6 @@ const _schema = i.schema({
     categories: i.entity({
       name: i.string().unique().indexed(),
       parent: i.string().optional(),
-      storeId: i.string().indexed(),
     }),
     collections: i.entity({
       createdAt: i.date(),
@@ -58,8 +44,6 @@ const _schema = i.schema({
       parent: i.string().optional(),
       pos: i.boolean().optional(),
       sortOrder: i.number().optional(),
-      storefront: i.boolean().optional(),
-      storeId: i.string().indexed(),
       updatedAt: i.date(),
     }),
     customers: i.entity({
@@ -71,7 +55,6 @@ const _schema = i.schema({
       name: i.string(),
       notes: i.string().optional(),
       phone: i.string().indexed().optional(),
-      storeId: i.string().indexed(),
       tags: i.string().optional(),
       totalOrders: i.number().optional(),
       totalSpent: i.number().optional(),
@@ -83,7 +66,6 @@ const _schema = i.schema({
       handle: i.string().unique().indexed(),
       reference: i.string().optional(),
       size: i.number(),
-      storeId: i.string().indexed(),
       title: i.string(),
       type: i.string(),
       url: i.string(),
@@ -91,7 +73,6 @@ const _schema = i.schema({
     }),
     iadjust: i.entity({
       // Required fields with proper constraints
-      storeId: i.string().indexed(),
       itemId: i.string().indexed(),
       locationId: i.string().indexed(),
       
@@ -137,7 +118,6 @@ const _schema = i.schema({
     }),
     ilocations: i.entity({
       // Required fields with proper constraints
-      storeId: i.string().indexed(),
       itemId: i.string().indexed(),
       locationId: i.string().indexed(),
       
@@ -181,7 +161,6 @@ const _schema = i.schema({
       itemId: i.string().indexed(),
       quantity: i.number().indexed().optional(),
       reserved: i.number().indexed().optional(),
-      storeId: i.string().indexed(),
       updatedAt: i.date(),
     }),
     items: i.entity({
@@ -204,7 +183,6 @@ const _schema = i.schema({
       reorderlevel: i.number().optional(),
       saleprice: i.number().optional(),
       sku: i.string().indexed(),
-      storeId: i.string().indexed(),
       totalAvailable: i.number().indexed().optional(),
       totalCommitted: i.number().indexed().optional(),
       totalOnHand: i.number().indexed().optional(),
@@ -221,28 +199,17 @@ const _schema = i.schema({
       isDefault: i.boolean().optional(),
       metafields: i.json().optional(),
       name: i.string(),
-      storeId: i.string().indexed(),
       type: i.string().optional(),
       updatedAt: i.date().optional(),
     }),
     media: i.entity({
       order: i.number().optional(),
       parentId: i.string().indexed(),
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
       type: i.string().optional(),
       url: i.string().optional(),
     }),
-    menus: i.entity({
-      createdAt: i.date(),
-      items: i.json(),
-      name: i.string(),
-      order: i.number().optional(),
-      storefrontId: i.string().indexed(),
-      storeId: i.string().indexed(),
-      type: i.string().indexed(),
-      updatedAt: i.date().optional(),
-      visible: i.boolean().optional(),
-    }),
+    // menus entity removed - storefront related
     metasets: i.entity({
       category: i.string().indexed(),
       config: i.json().optional(),
@@ -257,7 +224,7 @@ const _schema = i.schema({
       order: i.number().optional(),
       parentId: i.string().optional(),
       required: i.boolean().optional(),
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
       title: i.string().optional(),
       type: i.string(),
       updatedAt: i.date(),
@@ -268,14 +235,14 @@ const _schema = i.schema({
       entityId: i.string().indexed(),
       entityType: i.string().indexed(),
       setId: i.string().indexed(),
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
       updatedAt: i.date(),
       value: i.string().optional(),
     }),
     modifiers: i.entity({
       identifier: i.string().optional(),
       notes: i.string().optional(),
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
       title: i.string().optional(),
       type: i.string().optional(),
       value: i.number().optional(),
@@ -283,7 +250,7 @@ const _schema = i.schema({
     opsets: i.entity({
       createdAt: i.date().optional(),
       name: i.string(),
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
       updatedAt: i.date().optional(),
     }),
     opvalues: i.entity({
@@ -294,13 +261,13 @@ const _schema = i.schema({
       name: i.string(),
       order: i.number().optional(),
       setId: i.string().indexed(),
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
       updatedAt: i.date(),
     }),
     orderitems: i.entity({
       // Required fields
       orderId: i.string().indexed(),
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
       title: i.string(),
       quantity: i.number(), // Standardized from qty
       price: i.number(),
@@ -337,7 +304,7 @@ const _schema = i.schema({
     }),
     orders: i.entity({
       // Required business fields
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
       orderNumber: i.string().unique().indexed(),
       referenceId: i.string().unique().indexed(), // Standardized from referid
       subtotal: i.number(),
@@ -392,26 +359,12 @@ const _schema = i.schema({
       discount: i.number().optional(), // Deprecated in favor of discountAmount
       fulfill: i.string().optional(), // Deprecated in favor of fulfillmentStatus
     }),
-    pages: i.entity({
-      content: i.json().optional(),
-      createdAt: i.date().optional(),
-      isHomepage: i.boolean().optional(),
-      order: i.number().optional(),
-      published: i.boolean().optional(),
-      seoDescription: i.string().optional(),
-      seoTitle: i.string().optional(),
-      slug: i.string().indexed().optional(),
-      storefrontId: i.string().indexed().optional(),
-      storeId: i.string().indexed().optional(),
-      title: i.string().optional(),
-      type: i.string().indexed().optional(),
-      updatedAt: i.date().optional(),
-    }),
+    // pages entity removed - storefront related
     path: i.entity({
       location: i.string().optional(),
       notes: i.string().optional(),
       parentId: i.string().indexed(),
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
       title: i.string().optional(),
     }),
     peoplea: i.entity({
@@ -423,27 +376,11 @@ const _schema = i.schema({
       updatedAt: i.date().optional(),
       userId: i.string().unique().indexed(),
     }),
-    posts: i.entity({
-      author: i.string().optional(),
-      content: i.json().optional(),
-      createdAt: i.date(),
-      excerpt: i.string().optional(),
-      featuredImage: i.string().optional(),
-      published: i.boolean().optional(),
-      publishedAt: i.date().optional(),
-      seoDescription: i.string().optional(),
-      seoTitle: i.string().optional(),
-      slug: i.string().indexed(),
-      storefrontId: i.string().indexed(),
-      storeId: i.string().indexed(),
-      tags: i.json().optional(),
-      title: i.string(),
-      updatedAt: i.date().optional(),
-    }),
+    // posts entity removed - storefront related
     products: i.entity({
       // Required fields (previously optional)
       title: i.string().indexed(), // Required for search, was optional
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
       
       // Consistent timestamp naming (createdAt/updatedAt)
       createdAt: i.date().indexed(),
@@ -504,7 +441,7 @@ const _schema = i.schema({
       fifo: i.number().optional(),
       parentId: i.string().indexed(),
       path: i.string().optional(),
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
     }),
     store: i.entity({
       address: i.string().optional(),
@@ -518,112 +455,27 @@ const _schema = i.schema({
       updatedAt: i.date().optional(),
       website: i.string().optional(),
     }),
-    storefronts: i.entity({
-      createdAt: i.date().optional(),
-      customDomain: i.string().unique().indexed().optional(),
-      description: i.string().optional(),
-      favicon: i.string().optional(),
-      fontFamily: i.string().optional(),
-      logo: i.string().optional(),
-      name: i.string().optional(),
-      ownerId: i.string().indexed().optional(),
-      primaryColor: i.string().optional(),
-      published: i.boolean().optional(),
-      secondaryColor: i.string().optional(),
-      seoDescription: i.string().optional(),
-      seoTitle: i.string().optional(),
-      storeId: i.string().unique().indexed().optional(),
-      subdomain: i.string().unique().indexed().optional(),
-      theme: i.string().optional(),
-      updatedAt: i.date().optional(),
-    }),
+    // storefronts entity removed - storefront related
 
     tags: i.entity({
       createdAt: i.date().optional(),
       name: i.string().unique().indexed(),
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
       updatedAt: i.date().optional(),
     }),
-    testimonials: i.entity({
-      approved: i.boolean().optional(),
-      content: i.string(),
-      createdAt: i.date(),
-      customerImage: i.string().optional(),
-      customerName: i.string(),
-      featured: i.boolean().optional(),
-      productId: i.string().indexed().optional(),
-      rating: i.number().optional(),
-      storefrontId: i.string().indexed(),
-      storeId: i.string().indexed(),
-      updatedAt: i.date().optional(),
-    }),
-    themes: i.entity({
-      category: i.string().optional(),
-      createdAt: i.date(),
-      description: i.string().optional(),
-      isPremium: i.boolean().optional(),
-      name: i.string().unique().indexed(),
-      preview: i.string().optional(),
-      variables: i.json(),
-    }),
+    // testimonials entity removed - storefront related
+    // themes entity removed - storefront related
     types: i.entity({
       name: i.string().unique().indexed(),
       parent: i.string().optional(),
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
     }),
     vendors: i.entity({
       name: i.string().unique().indexed(),
-      storeId: i.string().indexed(),
+      // storeId removed - single store app
     }),
-    // Session entity for cart management (anonymous and authenticated users)
-    sessions: i.entity({
-      sessionId: i.string().unique().indexed(),
-      userId: i.string().indexed().optional(), // null for anonymous sessions
-      storeId: i.string().indexed(),
-      deviceId: i.string().indexed().optional(),
-      ipAddress: i.string().optional(),
-      userAgent: i.string().optional(),
-      createdAt: i.date().indexed(),
-      lastActivity: i.date().indexed(),
-      expiresAt: i.date().indexed(),
-      isActive: i.boolean().indexed(),
-      metadata: i.json().optional(),
-    }),
-    // Enhanced audit system entities
-    audit_sessions: i.entity({
-      sessionId: i.string().unique().indexed(),
-      storeId: i.string().indexed(),
-      userId: i.string().indexed().optional(),
-      userName: i.string().indexed().optional(),
-      userRole: i.string().indexed().optional(),
-      deviceId: i.string().indexed().optional(),
-      ipAddress: i.string().optional(),
-      startedAt: i.date().indexed(),
-      endedAt: i.date().indexed().optional(),
-      totalAdjustments: i.number().optional(),
-      totalQuantityChange: i.number().optional(),
-      totalCostImpact: i.number().optional(),
-      notes: i.string().optional(),
-      isActive: i.boolean().indexed().optional(),
-    }),
-    audit_batches: i.entity({
-      batchId: i.string().unique().indexed(),
-      storeId: i.string().indexed(),
-      sessionId: i.string().indexed().optional(),
-      userId: i.string().indexed().optional(),
-      userName: i.string().indexed().optional(),
-      batchType: i.string().indexed(), // 'bulk_adjustment', 'cycle_count', 'transfer', 'receiving'
-      description: i.string().optional(),
-      createdAt: i.date().indexed(),
-      completedAt: i.date().indexed().optional(),
-      totalItems: i.number().optional(),
-      processedItems: i.number().optional(),
-      totalQuantityChange: i.number().optional(),
-      totalCostImpact: i.number().optional(),
-      status: i.string().indexed(), // 'pending', 'processing', 'completed', 'failed'
-      errorCount: i.number().optional(),
-      notes: i.string().optional(),
-    }),
+    // sessions entity removed - not needed for core POS
+    // audit_sessions and audit_batches entities removed - simplified for core POS
   },
   links: {
     cart$users: {
@@ -782,18 +634,7 @@ const _schema = i.schema({
         label: "order",
       },
     },
-    pagesBlocks: {
-      forward: {
-        on: "pages",
-        has: "many",
-        label: "blocks",
-      },
-      reverse: {
-        on: "blocks",
-        has: "one",
-        label: "page",
-      },
-    },
+    // pagesBlocks link removed - pages and blocks entities removed
     peoplea$users: {
       forward: {
         on: "peoplea",
@@ -866,78 +707,9 @@ const _schema = i.schema({
         label: "store",
       },
     },
-    storeStorefront: {
-      forward: {
-        on: "store",
-        has: "one",
-        label: "storefront",
-      },
-      reverse: {
-        on: "storefronts",
-        has: "one",
-        label: "store",
-      },
-    },
-    storefrontsMenus: {
-      forward: {
-        on: "storefronts",
-        has: "many",
-        label: "menus",
-      },
-      reverse: {
-        on: "menus",
-        has: "one",
-        label: "storefront",
-      },
-    },
-    storefrontsPages: {
-      forward: {
-        on: "storefronts",
-        has: "many",
-        label: "pages",
-      },
-      reverse: {
-        on: "pages",
-        has: "one",
-        label: "storefront",
-      },
-    },
-    storefrontsPosts: {
-      forward: {
-        on: "storefronts",
-        has: "many",
-        label: "posts",
-      },
-      reverse: {
-        on: "posts",
-        has: "one",
-        label: "storefront",
-      },
-    },
-    storefrontsTestimonials: {
-      forward: {
-        on: "storefronts",
-        has: "many",
-        label: "testimonials",
-      },
-      reverse: {
-        on: "testimonials",
-        has: "one",
-        label: "storefront",
-      },
-    },
-    testimonialsProduct: {
-      forward: {
-        on: "testimonials",
-        has: "one",
-        label: "product",
-      },
-      reverse: {
-        on: "products",
-        has: "many",
-        label: "testimonials",
-      },
-    },
+    // storeStorefront link removed - storefronts entity removed
+    // storefront-related links removed - entities no longer exist
+    // testimonialsProduct link removed - testimonials entity removed
 
     ordersLocation: {
       forward: {
@@ -951,56 +723,8 @@ const _schema = i.schema({
         label: "orders",
       },
     },
-    // Enhanced audit system relationships
-    auditSessionsAdjustments: {
-      forward: {
-        on: "audit_sessions",
-        has: "many",
-        label: "adjustments",
-      },
-      reverse: {
-        on: "iadjust",
-        has: "one",
-        label: "session",
-      },
-    },
-    auditBatchesAdjustments: {
-      forward: {
-        on: "audit_batches",
-        has: "many",
-        label: "adjustments",
-      },
-      reverse: {
-        on: "iadjust",
-        has: "one",
-        label: "batch",
-      },
-    },
-    auditSessionsBatches: {
-      forward: {
-        on: "audit_sessions",
-        has: "many",
-        label: "batches",
-      },
-      reverse: {
-        on: "audit_batches",
-        has: "one",
-        label: "session",
-      },
-    },
-    // Cart session relationship for anonymous and authenticated users
-    cartSession: {
-      forward: {
-        on: "cart",
-        has: "one",
-        label: "session",
-      },
-      reverse: {
-        on: "sessions",
-        has: "many",
-        label: "cart",
-      },
-    },
+    // audit system relationships removed - entities removed
+    // cartSession link removed - sessions entity removed
   },
   rooms: {},
 });

@@ -6,7 +6,7 @@ import { db } from '../lib/instant';
 import StoreForm from './store-form';
 import ComList from './comlist';
 
-type Screen = 'space' | 'sales' | 'reports' | 'products' | 'collections' | 'options' | 'metafields' | 'menu' | 'items' | 'locations' | 'store-management';
+type Screen = 'sales' | 'reports' | 'products' | 'collections' | 'options' | 'metafields' | 'menu' | 'items' | 'locations' | 'store-management';
 
 interface WorkspaceProps {
   onNavigate: (screen: Screen) => void;
@@ -19,13 +19,7 @@ export default function Workspace({ onNavigate, onClose }: WorkspaceProps) {
   const [showComList, setShowComList] = useState(false);
   const [salesMetrics, setSalesMetrics] = useState({ totalSales: 0, orderCount: 0 });
 
-  // User status and notification data
-  const userData = {
-    spaceNotifications: [
-      { type: 'taxi', message: 'Taxi arriving in 10 minutes', time: '10 mins' },
-      { type: 'cab', message: 'Cab booked for 3:30 PM', time: '15 mins' }
-    ]
-  };
+  // Space notifications removed
 
 
 
@@ -79,9 +73,7 @@ export default function Workspace({ onNavigate, onClose }: WorkspaceProps) {
 
   const handleItemPress = (itemId: string) => {
     // Handle special cases
-    if (itemId === 'space') {
-      onNavigate('space' as Screen);
-    } else if (itemId === 'commerce') {
+    if (itemId === 'commerce') {
       // Close menu and navigate to sales
       onClose();
       onNavigate('sales' as Screen);
@@ -121,21 +113,7 @@ export default function Workspace({ onNavigate, onClose }: WorkspaceProps) {
     <View className="flex-1 bg-white">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="px-6 pt-6">
-          {/* Space Card - White */}
-          <TouchableOpacity
-            onPress={() => handleItemPress('space')}
-            className="bg-white p-4 mb-1"
-            style={{ minHeight: 120 }}
-          >
-            <View className="flex-1">
-              <Text className="text-black text-2xl font-bold mb-2">Space</Text>
-              <Text className="text-gray-500 text-xl font-bold">
-                {userData.spaceNotifications.length > 0
-                  ? userData.spaceNotifications[0].message
-                  : 'Taxi arriving in 10 minutes'}
-              </Text>
-            </View>
-          </TouchableOpacity>
+          {/* Space card removed */}
 
           {/* Commerce Card - Light White */}
           <View

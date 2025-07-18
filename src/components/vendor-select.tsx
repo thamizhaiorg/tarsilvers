@@ -91,10 +91,6 @@ export default function VendorSelect({ selectedVendor, onSelect, onClose }: Vend
 
   const handleAddVendor = async () => {
     if (!searchQuery.trim()) return;
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'Please select a store first');
-      return;
-    }
 
     const existingVendor = vendors.find(v =>
       v.name?.toLowerCase() === searchQuery.trim().toLowerCase()

@@ -42,60 +42,35 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const stores = data?.store || [];
 
-  const loadCurrentStore = async () => {
-    try {
-      const storedStoreId = await AsyncStorage.getItem(CURRENT_STORE_KEY);
-      if (storedStoreId && stores.length > 0) {
-        const store = stores.find(s => s.id === storedStoreId);
-        if (store) {
-          setCurrentStoreState({
-            ...store,
-            createdAt: new Date(store.createdAt),
-            updatedAt: store.updatedAt ? new Date(store.updatedAt) : undefined
-          });
-        } else {
-          // Stored store ID doesn't exist anymore, clear it
-          await AsyncStorage.removeItem(CURRENT_STORE_KEY);
-        }
-      }
-    } catch (error) {
-      // ...removed debug log...
-    }
-  };
-
-  // Load current store from AsyncStorage when stores are available
+  // Auto-create and set default store "skj silversmith"
   useEffect(() => {
-    if (stores.length > 0 && !currentStore) {
-      loadCurrentStore();
-    }
-  }, [stores.length]); // Only depend on stores.length to avoid infinite loops
-
-  // Auto-select first store if none selected and stores exist
-  useEffect(() => {
-    if (!queryLoading && !currentStore && stores.length > 0) {
-      // Only auto-select if we haven't tried to load from storage yet
-      const autoSelectFirstStore = async () => {
+    if (!queryLoading && stores.length === 0 && !currentStore) {
+      // No stores exist, create the default store
+      const createDefaultStore = async () => {
         try {
-          const storedStoreId = await AsyncStorage.getItem(CURRENT_STORE_KEY);
-          if (!storedStoreId) {
-            // No stored preference, select first store
-            await setCurrentStore({
-              ...stores[0],
-              createdAt: new Date(stores[0].createdAt),
-              updatedAt: stores[0].updatedAt ? new Date(stores[0].updatedAt) : undefined
-            });
-          }
-        } catch (error) {
-          // ...removed debug log...
-          // Fallback to first store
-          await setCurrentStore({
-            ...stores[0],
-            createdAt: new Date(stores[0].createdAt),
-            updatedAt: stores[0].updatedAt ? new Date(stores[0].updatedAt) : undefined
+          const defaultStore = await createStore({
+            name: 'skj silversmith',
+            description: 'Default store',
+            email: '',
+            phone: '',
+            address: '',
+            website: '',
+            logo: ''
           });
+          setCurrentStoreState(defaultStore);
+        } catch (error) {
+          console.error('Failed to create default store:', error);
         }
       };
-      autoSelectFirstStore();
+      createDefaultStore();
+    } else if (!queryLoading && stores.length > 0 && !currentStore) {
+      // Stores exist, find and set "skj silversmith" or first store
+      const defaultStore = stores.find(s => s.name === 'skj silversmith') || stores[0];
+      setCurrentStoreState({
+        ...defaultStore,
+        createdAt: new Date(defaultStore.createdAt),
+        updatedAt: defaultStore.updatedAt ? new Date(defaultStore.updatedAt) : undefined
+      });
     }
     setIsLoading(queryLoading);
   }, [stores, currentStore, queryLoading]);

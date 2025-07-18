@@ -61,10 +61,6 @@ export default function OptionSetsScreen({ onNavigateToEdit, onClose }: OptionSe
   const totalSets = optionSets.length;
 
   const handleCreateSet = async () => {
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'No store selected');
-      return;
-    }
 
     try {
       const setId = id();

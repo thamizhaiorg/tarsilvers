@@ -134,10 +134,6 @@ export default function FileUpload({
   };
 
   const uploadFile = async (file: any) => {
-    if (!currentStore) {
-      Alert.alert('Error', 'No store selected');
-      return;
-    }
 
     if (!validateFile(file)) return;
 

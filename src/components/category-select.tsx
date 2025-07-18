@@ -92,10 +92,6 @@ export default function CategorySelect({ selectedCategory, onSelect, onClose }: 
 
   const handleAddCategory = async () => {
     if (!searchQuery.trim()) return;
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'Please select a store first');
-      return;
-    }
 
     const existingCategory = categories.find(c =>
       c.name?.toLowerCase() === searchQuery.trim().toLowerCase()

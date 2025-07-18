@@ -198,10 +198,7 @@ export default function QuickSale({ onClose, onOrderCreated }: QuickSaleProps) {
       return;
     }
 
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'Please select a store first');
-      return;
-    }
+
 
     setIsProcessing(true);
     try {

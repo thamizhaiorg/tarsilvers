@@ -140,11 +140,7 @@ export default function OrderCreate({ onClose, onOrderCreated }: OrderCreateProp
       return;
     }
 
-    if (!currentStore?.id) {
-      hapticFeedback.error();
-      Alert.alert('Error', 'Please select a store first');
-      return;
-    }
+
 
     setIsCreatingOrder(true);
     try {

@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 
-type Screen = 'space' | 'sales' | 'reports' | 'products' | 'collections' | 'options' | 'metafields' | 'menu' | 'items' | 'locations' | 'storefront';
+type Screen = 'space' | 'sales' | 'reports' | 'products' | 'collections' | 'options' | 'metafields' | 'menu' | 'items' | 'locations';
 
 interface ComListProps {
   onNavigate: (screen: Screen) => void;
@@ -14,10 +14,6 @@ export default function ComList({ onNavigate, onClose }: ComListProps) {
   const insets = useSafeAreaInsets();
 
   const commerceItems = [
-    {
-      id: 'storefront',
-      title: 'Storefront Site'
-    },
     {
       id: 'collections',
       title: 'Collections'

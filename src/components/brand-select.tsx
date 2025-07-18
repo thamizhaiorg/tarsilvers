@@ -91,10 +91,6 @@ export default function BrandSelect({ selectedBrand, onSelect, onClose }: BrandS
 
   const handleAddBrand = async () => {
     if (!searchQuery.trim()) return;
-    if (!currentStore?.id) {
-      Alert.alert('Error', 'Please select a store first');
-      return;
-    }
 
     const existingBrand = brands.find(b =>
       b.name?.toLowerCase() === searchQuery.trim().toLowerCase()

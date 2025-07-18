@@ -401,9 +401,9 @@ export default function ProductsScreen({ isGridView = false, onProductFormOpen, 
   if (!currentStore) {
     return (
       <EmptyState
-        icon="store"
-        title="No Store Selected"
-        description="Please select a store to view products"
+        icon="package"
+        title="No Products"
+        description="Start by adding your first product"
       />
     );
   }

@@ -12,7 +12,7 @@ import CollectionsScreen from "../components/collections";
 import CollectionFormScreen from "../components/col-form";
 import ProductsManagementScreen from "../components/prod-mgmt";
 import CollectionsManagementScreen from "../components/col-mgmt";
-import SpaceScreen from "../components/space";
+// Space screen removed
 import SquarePOS from "../components/square-pos";
 import ReportsScreen from "../components/reports";
 import ItemStock from "../components/item-stock";
@@ -22,12 +22,11 @@ import MetafieldsSystem from "../components/metafields-system";
 import Locations from "../components/locations";
 import ItemsScreen from "../components/items";
 import FilesScreen from "../components/files";
-import PeopleaScreen from "../screens/peoplea";
-import StoreManagement from "../components/store-mgmt";
-import StorefrontScreen from "../components/storefront";
+// People screen removed
 
-import BottomNavigation, { BottomTab, MainScreen } from "../components/nav";
-import BottomTabContent from "../components/tabs";
+// Storefront screen removed
+
+import { MainScreen } from "../components/nav";
 
 
 import { StoreProvider } from "../lib/store-context";
@@ -37,7 +36,6 @@ import ErrorBoundary from "../components/ui/error-boundary";
 
 
 type Screen =
-  | 'space'
   | 'sales'
   | 'reports'
   | 'products'
@@ -50,9 +48,7 @@ type Screen =
   | 'items'
   | 'locations'
   | 'files'
-  | 'profile'
-  | 'store-management'
-  | 'storefront';
+  | 'profile';
 
 interface NavigationData {
   productId?: string;
@@ -62,8 +58,6 @@ interface NavigationData {
 
 interface NavigationState {
   screen: Screen;
-  showBottomTabs: boolean;
-  activeBottomTab: BottomTab;
   showManagement: boolean;
   data?: NavigationData;
 }
@@ -71,8 +65,7 @@ interface NavigationState {
 export default function Page() {
   const { user, isLoading } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<Screen>('menu');
-  const [activeBottomTab, setActiveBottomTab] = useState<BottomTab>('workspace');
-  const [showBottomTabs, setShowBottomTabs] = useState(true); // Start untoggled (bottom tabs shown, square icon not highlighted)
+  // Bottom navigation removed
   const [isGridView, setIsGridView] = useState(false); // false = list view (default), true = grid view
   const [showManagement, setShowManagement] = useState(false); // false = product/collection list (default), true = management screen
   const [productFormProduct, setProductFormProduct] = useState<Product | null>(null); // Track product being edited in form
@@ -88,8 +81,6 @@ export default function Page() {
   // Navigation stack to track navigation history
   const [navigationStack, setNavigationStack] = useState<NavigationState[]>([{
     screen: 'menu',
-    showBottomTabs: true,
-    activeBottomTab: 'workspace',
     showManagement: false
   }]);
 
@@ -106,8 +97,6 @@ export default function Page() {
       if (previousState) {
         // Restore previous state
         setCurrentScreen(previousState.screen);
-        setShowBottomTabs(previousState.showBottomTabs);
-        setActiveBottomTab(previousState.activeBottomTab);
         setShowManagement(previousState.showManagement);
         if (previousState.data) {
           setOptionSetData(previousState.data);
@@ -150,12 +139,7 @@ export default function Page() {
         return true;
       }
 
-      // If bottom tabs are toggled (hidden), show them
-      if (!showBottomTabs && currentScreen !== 'menu') {
-        setShowBottomTabs(true);
-        setActiveBottomTab('workspace');
-        return true;
-      }
+      // Bottom navigation removed
 
       // For full-screen screens, handle back navigation based on context
       if (currentScreen === 'options' || currentScreen === 'metafields' || currentScreen === 'items' || currentScreen === 'locations' || currentScreen === 'files') {
@@ -183,8 +167,6 @@ export default function Page() {
         }
         // If no navigation history, go to menu
         setCurrentScreen('menu');
-        setShowBottomTabs(true);
-        setActiveBottomTab('workspace');
         setShowManagement(false);
         return true;
       }
@@ -195,15 +177,13 @@ export default function Page() {
         return true;
       }
 
-      // If on space and no navigation history, allow default back behavior (exit app)
+      // If on menu and no navigation history, allow default back behavior (exit app)
       if (currentScreen === 'menu') {
         return false;
       }
 
       // Fallback: if navigation stack is empty or failed, go to menu
       setCurrentScreen('menu');
-      setShowBottomTabs(true);
-      setActiveBottomTab('workspace');
       setShowManagement(false);
       setNavigationData(null);
       return true;
@@ -212,7 +192,7 @@ export default function Page() {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
     return () => backHandler.remove();
-  }, [currentScreen, showManagement, showBottomTabs, isProductFormOpen, isCollectionFormOpen, isItemStockOpen, handleGoBack, closeItemStock]);
+  }, [currentScreen, showManagement, isProductFormOpen, isCollectionFormOpen, isItemStockOpen, handleGoBack, closeItemStock]);
 
   // Form handlers
   const openProductForm = useCallback((product?: any) => {
@@ -263,25 +243,12 @@ export default function Page() {
     // Save current state to navigation stack before navigating
     const currentState: NavigationState = {
       screen: currentScreen,
-      showBottomTabs,
-      activeBottomTab,
       showManagement,
       data: optionSetData
     };
 
     setCurrentScreen(screen);
     setNavigationData(data); // Store the navigation data
-
-    // For menu screen, ensure we reset all navigation states
-    if (screen === 'menu') {
-      setShowBottomTabs(true);
-      setActiveBottomTab('workspace');
-    }
-    // All screens except menu show bottom tabs by default (untoggled state)
-    else if (screen !== 'option-create' && screen !== 'option-edit') {
-      setShowBottomTabs(true); // Dashboard, sales, reports, products, collections start untoggled (tabs shown)
-      setActiveBottomTab('workspace'); // Reset to workspace tab when changing main screens
-    }
 
     // Reset management view when navigating to products/collections
     if (screen === 'products' || screen === 'collections') {
@@ -300,18 +267,9 @@ export default function Page() {
       }
       return prev;
     });
-  }, [currentScreen, showBottomTabs, activeBottomTab, showManagement, optionSetData, isProductFormOpen, isCollectionFormOpen]);
+  }, [currentScreen, showManagement, optionSetData, isProductFormOpen, isCollectionFormOpen]);
 
-  const handleBottomTabPress = useCallback((tab: BottomTab) => {
-    setActiveBottomTab(tab);
-    // If clicking on workspace tab, show main content (showBottomTabs = true)
-    // If clicking on other tabs (ai, tasks, people), show tab content (showBottomTabs = false)
-    if (tab === 'workspace') {
-      setShowBottomTabs(true);
-    } else {
-      setShowBottomTabs(false);
-    }
-  }, []);
+  // Bottom navigation removed
 
   const renderMainContent = () => {
     // If product form is open, render it full screen
@@ -364,20 +322,11 @@ export default function Page() {
       return <CollectionsManagementScreen />;
     }
 
-    // If bottom tabs are toggled (showBottomTabs = false), render the bottom tab content
-    if (!showBottomTabs) {
-      return (
-        <BottomTabContent
-          activeTab={activeBottomTab}
-          currentScreen={currentScreen as MainScreen}
-        />
-      );
-    }
+    // Bottom navigation removed
 
     // Otherwise render the main screens (default untoggled state)
     switch (currentScreen) {
-      case 'space':
-        return <SpaceScreen onOpenMenu={() => handleNavigate('menu')} />;
+      // Space screen removed
       case 'sales':
         return <SquarePOS onClose={() => handleNavigate('menu')} onOrderCreated={(orderId) => {
           // Optionally handle order creation success
@@ -409,7 +358,7 @@ export default function Page() {
         />;
       case 'options':
         return <Options
-          onClose={() => handleNavigate('space')}
+          onClose={() => handleNavigate('menu')}
           onOpenMenu={() => handleNavigate('menu')}
         />;
       case 'metafields':
@@ -453,27 +402,21 @@ export default function Page() {
         />;
 
       case 'profile':
-        return <PeopleaScreen
-          onClose={() => handleNavigate('menu')}
-        />;
+        // Profile screen removed - redirect to menu
+        handleNavigate('menu');
+        return null;
 
-      case 'store-management':
-        return <StoreManagement
-          onClose={() => handleNavigate('menu')}
-        />;
 
-      case 'storefront':
-        return <StorefrontScreen
-          onClose={() => handleNavigate('menu')}
-        />;
+
+      // Storefront screen removed
 
       case 'menu':
         return <Workspace
           onNavigate={handleNavigate}
-          onClose={() => handleNavigate('space')}
+          onClose={() => handleNavigate('menu')}
         />;
       default:
-        return <SpaceScreen onOpenMenu={() => handleNavigate('menu')} />;
+        return <Workspace onNavigate={handleNavigate} onClose={() => handleNavigate('menu')} />;
     }
   };
 
@@ -495,19 +438,17 @@ export default function Page() {
     <StoreProvider>
       <ErrorBoundary>
         <View className="flex flex-1">
-          {currentScreen === 'sales' || currentScreen === 'options' || currentScreen === 'metafields' || currentScreen === 'items' || currentScreen === 'locations' || currentScreen === 'files' || currentScreen === 'profile' || currentScreen === 'store-management' || currentScreen === 'storefront' || isProductFormOpen || isCollectionFormOpen || isItemStockOpen ? (
+          {currentScreen === 'sales' || currentScreen === 'options' || currentScreen === 'metafields' || currentScreen === 'items' || currentScreen === 'locations' || currentScreen === 'files' || currentScreen === 'profile' || isProductFormOpen || isCollectionFormOpen || isItemStockOpen ? (
             // Full screen screens without header or bottom navigation (including product and collection forms)
             <ErrorBoundary>
               {renderMainContent()}
             </ErrorBoundary>
           ) : (
-            // All other screens with header and bottom navigation
+            // All other screens with header only (bottom navigation removed)
             <>
               <Header
                 currentScreen={currentScreen}
                 onNavigate={handleNavigate}
-                showBottomTabs={showBottomTabs}
-                setShowBottomTabs={setShowBottomTabs}
                 isGridView={isGridView}
                 setIsGridView={setIsGridView}
                 showManagement={showManagement}
@@ -520,11 +461,6 @@ export default function Page() {
               <ErrorBoundary>
                 {renderMainContent()}
               </ErrorBoundary>
-              <BottomNavigation
-                activeTab={activeBottomTab}
-                onTabPress={handleBottomTabPress}
-                currentScreen={currentScreen as MainScreen}
-              />
             </>
           )}
         </View>
@@ -658,11 +594,9 @@ function MenuScreen({ onNavigate }: { onNavigate: (screen: Screen) => void }) {
   );
 }
 
-function Header({ currentScreen, onNavigate, showBottomTabs, setShowBottomTabs, isGridView, setIsGridView, showManagement, setShowManagement, productFormProduct, isProductFormOpen, collectionFormCollection, isCollectionFormOpen }: {
+function Header({ currentScreen, onNavigate, isGridView, setIsGridView, showManagement, setShowManagement, productFormProduct, isProductFormOpen, collectionFormCollection, isCollectionFormOpen }: {
   currentScreen: Screen;
   onNavigate: (screen: Screen) => void;
-  showBottomTabs: boolean;
-  setShowBottomTabs: (show: boolean) => void;
   isGridView: boolean;
   setIsGridView: (isGrid: boolean) => void;
   showManagement: boolean;
@@ -733,8 +667,7 @@ function Header({ currentScreen, onNavigate, showBottomTabs, setShowBottomTabs, 
     }
 
     switch (screen) {
-      case 'space':
-        return { title: 'Space', icon: '🌌' };
+      // Space screen removed
       case 'menu':
         return { title: 'Workspace', icon: '🏢' };
       case 'products':
@@ -747,8 +680,7 @@ function Header({ currentScreen, onNavigate, showBottomTabs, setShowBottomTabs, 
         return { title: 'Metafields', icon: '#' };
       case 'files':
         return { title: 'Files', icon: '📁' };
-      case 'storefront':
-        return { title: 'Storefront', icon: '🌐' };
+      // Storefront removed
 
       case 'sales':
         return { title: 'Sales', icon: '💰' };
