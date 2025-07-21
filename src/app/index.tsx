@@ -23,6 +23,7 @@ import Locations from "../components/locations";
 import ItemsScreen from "../components/items";
 import FilesScreen from "../components/files";
 import ProfileScreen from "../screens/profile";
+import OrdersScreen from "../components/orders";
 
 import { MainScreen } from "../components/nav";
 
@@ -46,7 +47,8 @@ type Screen =
   | 'items'
   | 'locations'
   | 'files'
-  | 'profile';
+  | 'profile'
+  | 'orders';
 
 interface NavigationData {
   productId?: string;
@@ -402,7 +404,15 @@ export default function Page() {
       case 'profile':
         return <ProfileScreen onClose={() => handleNavigate('menu')} />;
 
-
+      case 'orders':
+        return <OrdersScreen
+          onCreateOrder={() => handleNavigate('sales')}
+          onOrderSelect={(order) => {
+            // Handle order selection - could navigate to order details
+            console.log('Order selected:', order);
+          }}
+          onClose={() => handleNavigate('menu')}
+        />;
 
       // Storefront screen removed
 
@@ -434,7 +444,7 @@ export default function Page() {
     <StoreProvider>
       <ErrorBoundary>
         <View className="flex flex-1">
-          {currentScreen === 'sales' || currentScreen === 'options' || currentScreen === 'metafields' || currentScreen === 'items' || currentScreen === 'locations' || currentScreen === 'files' || currentScreen === 'profile' || isProductFormOpen || isCollectionFormOpen || isItemStockOpen ? (
+          {currentScreen === 'sales' || currentScreen === 'options' || currentScreen === 'metafields' || currentScreen === 'items' || currentScreen === 'locations' || currentScreen === 'files' || currentScreen === 'profile' || currentScreen === 'orders' || isProductFormOpen || isCollectionFormOpen || isItemStockOpen ? (
             // Full screen screens without header or bottom navigation (including product and collection forms)
             <ErrorBoundary>
               {renderMainContent()}

@@ -42,9 +42,9 @@ interface OrdersScreenProps {
 
 const ORDER_FILTERS = [
   { id: 'all', label: 'All' },
+  { id: 'open', label: 'Open' },
   { id: 'unfulfilled', label: 'Unfulfilled' },
   { id: 'unpaid', label: 'Unpaid' },
-  { id: 'open', label: 'Open' },
   { id: 'archived', label: 'Archived' }
 ];
 
@@ -163,43 +163,48 @@ export default function OrdersScreen({ onCreateOrder, onOrderSelect, onClose }: 
     return (
       <TouchableOpacity
         onPress={() => onOrderSelect(order)}
-        className="mx-6 mb-4"
+        className="px-4 py-4 bg-white"
       >
-        <View className="bg-white rounded-2xl p-6">
-          <View className="flex-row justify-between items-start mb-3">
-            <View className="flex-1">
-              <Text className="text-xl font-bold text-gray-900 mb-1">
-                {order.orderNumber}
-              </Text>
-              <Text className="text-base text-gray-600">
-                {customerName}
-              </Text>
-            </View>
-            <Text className="text-xl font-bold text-gray-900">
-              {formatCurrency(order.total)}
-            </Text>
+        <View className="flex-row items-center">
+          {/* Order Icon */}
+          <View className="w-12 h-12 bg-gray-200 mr-3 items-center justify-center rounded-lg">
+            <Feather name="shopping-bag" size={20} color="#6B7280" />
           </View>
 
-          <Text className="text-sm text-gray-500 mb-4">
-            {itemCount} item{itemCount !== 1 ? 's' : ''} • {formatDate(order.createdAt)}
-          </Text>
-
-          <View className="flex-row items-center space-x-3">
-            <View className={`px-3 py-2 rounded-xl ${getStatusColor(order.fulfillmentStatus, 'fulfillment')}`}>
-              <Text className="text-sm font-semibold capitalize">
-                {order.fulfillmentStatus}
-              </Text>
-            </View>
-            <View className={`px-3 py-2 rounded-xl ${getStatusColor(order.paymentStatus, 'payment')}`}>
-              <Text className="text-sm font-semibold capitalize">
-                {order.paymentStatus}
-              </Text>
-            </View>
-            {order.status === 'open' && (
-              <View className="px-3 py-2 rounded-xl bg-blue-100">
-                <Text className="text-sm font-semibold text-blue-800">Open</Text>
+          {/* Order Details */}
+          <View className="flex-1">
+            <Text className="text-base font-medium text-gray-900 mb-1">
+              {order.orderNumber}
+            </Text>
+            <Text className="text-sm text-gray-500 mb-2">
+              {customerName} • {itemCount} item{itemCount !== 1 ? 's' : ''} • {formatDate(order.createdAt)}
+            </Text>
+            
+            {/* Status Tags */}
+            <View className="flex-row items-center">
+              <View className={`px-2 py-1 rounded-md mr-2 ${getStatusColor(order.fulfillmentStatus, 'fulfillment')}`}>
+                <Text className="text-xs font-medium capitalize">
+                  {order.fulfillmentStatus}
+                </Text>
               </View>
-            )}
+              <View className={`px-2 py-1 rounded-md mr-2 ${getStatusColor(order.paymentStatus, 'payment')}`}>
+                <Text className="text-xs font-medium capitalize">
+                  {order.paymentStatus}
+                </Text>
+              </View>
+              {order.status === 'open' && (
+                <View className="px-2 py-1 rounded-md bg-blue-100">
+                  <Text className="text-xs font-medium text-blue-800">Open</Text>
+                </View>
+              )}
+            </View>
+          </View>
+
+          {/* Price */}
+          <View className="items-end">
+            <Text className="text-base font-semibold text-gray-900">
+              {formatCurrency(order.total)}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -207,57 +212,50 @@ export default function OrdersScreen({ onCreateOrder, onOrderSelect, onClose }: 
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
-      {/* Modern Top Bar */}
-      <TopBar
-        title="Orders"
-        subtitle={`${filteredOrders.length} order${filteredOrders.length !== 1 ? 's' : ''}`}
-        onBack={onClose}
-        rightAction={{
-          icon: "plus",
-          onPress: onCreateOrder
-        }}
-      />
+    <View className="flex-1 bg-white">
+      {/* Search Bar - Following products screen pattern */}
+      <View className="bg-white px-4 py-3">
+        <View className="flex-row items-center">
+          {/* Back Icon */}
+          <TouchableOpacity onPress={onClose}>
+            <Feather name="arrow-left" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
 
-      {/* Search and Filters */}
-      <View className="px-6 py-4 bg-white border-b border-gray-200">
-        {/* Search Bar */}
-        <View className="flex-row items-center bg-gray-100 rounded-2xl px-4 py-3 mb-4">
-          <Feather name="search" size={20} color="#6B7280" />
+          {/* Search Input */}
           <TextInput
+            placeholder="Search orders..."
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholder="Search orders..."
-            className="flex-1 ml-3 text-base"
+            className="flex-1 text-base text-gray-900 ml-3 mr-3"
             placeholderTextColor="#9CA3AF"
           />
-        </View>
 
-        {/* Filter Tabs */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View className="flex-row space-x-3">
-            {ORDER_FILTERS.map((filter) => (
-              <TouchableOpacity
-                key={filter.id}
-                onPress={() => setActiveFilter(filter.id)}
-                className={`px-6 py-3 rounded-2xl ${
-                  activeFilter === filter.id
-                    ? 'bg-blue-600'
-                    : 'bg-gray-100'
-                }`}
-                style={{ minHeight: 48 }}
-              >
-                <Text className={`text-base font-semibold ${
-                  activeFilter === filter.id
-                    ? 'text-white'
-                    : 'text-gray-700'
-                }`}>
-                  {filter.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </ScrollView>
+          {/* Add Order Icon */}
+          <TouchableOpacity onPress={onCreateOrder}>
+            <Feather name="plus" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Filter Tabs - Following products screen pattern */}
+      <View className="px-4 py-3 bg-white border-b border-gray-100">
+        <View className="flex-row">
+          {ORDER_FILTERS.map((filter) => (
+            <TouchableOpacity
+              key={filter.id}
+              onPress={() => setActiveFilter(filter.id)}
+              className={`mr-6 pb-2 ${
+                activeFilter === filter.id ? 'border-b-2 border-blue-600' : ''
+              }`}
+            >
+              <Text className={`text-base font-medium ${
+                activeFilter === filter.id ? 'text-blue-600' : 'text-gray-500'
+              }`}>
+                {filter.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
       {/* Orders List */}

@@ -6,7 +6,7 @@ import { db } from '../lib/instant';
 import StoreForm from './store-form';
 import ComList from './comlist';
 
-type Screen = 'sales' | 'reports' | 'products' | 'collections' | 'options' | 'metafields' | 'menu' | 'items' | 'locations' | 'store-management';
+type Screen = 'sales' | 'reports' | 'products' | 'collections' | 'options' | 'metafields' | 'menu' | 'items' | 'locations' | 'store-management' | 'orders';
 
 interface WorkspaceProps {
   onNavigate: (screen: Screen) => void;
@@ -145,10 +145,10 @@ export default function Workspace({ onNavigate, onClose }: WorkspaceProps) {
                       ${salesMetrics.totalSales.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                     </Text>
                   </View>
-                  <View>
+                  <TouchableOpacity onPress={() => handleItemPress('orders')}>
                     <Text className="text-gray-600 text-sm">Orders</Text>
                     <Text className="text-black text-2xl font-bold">{salesMetrics.orderCount}</Text>
-                  </View>
+                  </TouchableOpacity>
                 </View>
                 
                 {/* New Sale Button */}

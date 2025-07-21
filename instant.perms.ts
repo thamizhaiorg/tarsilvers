@@ -3,65 +3,22 @@
 import type { InstantRules } from "@instantdb/react-native";
 
 const rules = {
-  items: {
-    allow: {
-      view: "auth.id != null",
-      create: "auth.id != null",
-      delete: "auth.id != null",
-      update: "auth.id != null",
-    },
-  },
-  store: {
-    bind: ["isOwner", "auth.id != null && auth.id == data.peopleaId"],
-    allow: {
-      view: "isOwner || true",
-      create: "auth.id != null",
-      delete: "isOwner",
-      update: "isOwner",
-    },
-  },
-  orders: {
-    allow: {
-      view: "auth.id != null",
-      create: "auth.id != null",
-      delete: "auth.id != null",
-      update: "auth.id != null",
-    },
-  },
-  peoplea: {
-    bind: ["isOwner", "auth.id != null && auth.id == data.userId"],
-    allow: {
-      view: "isOwner",
-      create: "isOwner",
-      delete: "isOwner",
-      update: "isOwner",
-    },
-  },
-  products: {
-    allow: {
-      view: "auth.id != null",
-      create: "auth.id != null",
-      delete: "auth.id != null",
-      update: "auth.id != null",
-    },
-  },
-  customers: {
-    allow: {
-      view: "auth.id != null",
-      create: "auth.id != null",
-      delete: "auth.id != null",
-      update: "auth.id != null",
-    },
-  },
-  __esModule: "true",
-  collections: {
-    allow: {
-      view: "auth.id != null",
-      create: "auth.id != null",
-      delete: "auth.id != null",
-      update: "auth.id != null",
-    },
-  },
+  /**
+   * Welcome to Instant's permission system!
+   * Right now your rules are empty. To start filling them in, check out the docs:
+   * https://www.instantdb.com/docs/permissions
+   *
+   * Here's an example to give you a feel:
+   * posts: {
+   *   allow: {
+   *     view: "true",
+   *     create: "isOwner",
+   *     update: "isOwner",
+   *     delete: "isOwner",
+   *   },
+   *   bind: ["isOwner", "auth.id != null && auth.id == data.ownerId"],
+   * },
+   */
 } satisfies InstantRules;
 
 export default rules;
