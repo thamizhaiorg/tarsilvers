@@ -2,14 +2,13 @@
 import { db } from './instant';
 import { log } from './logger';
 
-export const fixUnlinkedItems = async (storeId: string) => {
+export const fixUnlinkedItems = async () => {
   try {
-    log.info('Starting fix for unlinked items', 'FixUnlinkedItems', { storeId });
+    log.info('Starting fix for unlinked items', 'FixUnlinkedItems');
 
-    // Query all items for the store
+    // Query all items (no store filtering needed)
     const { data: allItemsData } = await db.queryOnce({
       items: {
-        $: { where: { storeId } },
         product: {}
       }
     });

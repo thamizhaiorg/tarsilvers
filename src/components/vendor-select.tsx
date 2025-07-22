@@ -20,7 +20,6 @@ interface VendorItem {
 
 export default function VendorSelect({ selectedVendor, onSelect, onClose }: VendorSelectProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [showBottomDrawer, setShowBottomDrawer] = useState(false);
   const [selectedVendorForAction, setSelectedVendorForAction] = useState<VendorItem | null>(null);

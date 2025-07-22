@@ -47,7 +47,6 @@ interface EditItemLocationsProps {
 
 export default function EditItemLocations({ item, itemLocations, onClose }: EditItemLocationsProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [locations, setLocations] = useState<Location[]>([]);
   const [stockLevels, setStockLevels] = useState<{ [locationId: string]: { onHand: number; committed: number; unavailable: number } }>({});
   const [originalStockLevels, setOriginalStockLevels] = useState<{ [locationId: string]: { onHand: number; committed: number; unavailable: number } }>({});

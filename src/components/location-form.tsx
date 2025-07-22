@@ -14,7 +14,6 @@ interface LocationFormProps {
 
 export default function LocationForm({ location, onClose, onSave }: LocationFormProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [loading, setLoading] = useState(false);
 
   // Form state
@@ -86,7 +85,6 @@ export default function LocationForm({ location, onClose, onSave }: LocationForm
       const locationId = location?.id || id();
 
       const locationData = {
-        storeId: currentStore.id,
         name: formData.name.trim(),
         type: formData.type,
         address: formData.address,

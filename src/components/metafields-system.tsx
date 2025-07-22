@@ -27,7 +27,6 @@ export default function MetafieldsSystem({
   entityType 
 }: MetafieldsSystemProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [selectedEntityType, setSelectedEntityType] = useState<MetafieldEntityType | null>(
     entityType || null
   );

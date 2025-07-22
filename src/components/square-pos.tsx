@@ -70,23 +70,6 @@ export default function SquarePOS({ onClose, onOrderCreated }: SquarePOSProps) {
     }
   });
 
-  // Debug query to see all products in the store (without filters)
-  const { data: debugData } = db.useQuery(
-    currentStore?.id ? {
-      products: {
-        item: {},
-        $: {
-          where: {
-            storeId: currentStore.id
-          },
-          order: {
-            createdAt: 'desc'
-          }
-        }
-      }
-    } : null
-  );
-
   // Flatten all items from active POS products
   const items = useMemo(() => {
     const products = data?.products || [];
@@ -209,9 +192,8 @@ export default function SquarePOS({ onClose, onOrderCreated }: SquarePOSProps) {
     try {
       const orderId = id();
       const orderNumber = generateOrderNumber();
-      
+
       const orderData = {
-        storeId: currentStore.id,
         orderNumber,
         referenceId: orderId,
         createdAt: new Date(),
@@ -247,7 +229,6 @@ export default function SquarePOS({ onClose, onOrderCreated }: SquarePOSProps) {
           taxAmount: 0,
           discountAmount: 0,
           lineTotal: item.total,
-          storeId: currentStore.id,
           productImage: item.image,
           fulfillmentStatus: 'fulfilled'
         });

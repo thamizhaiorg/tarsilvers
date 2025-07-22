@@ -30,34 +30,26 @@ export default function ReportsScreen({ onOpenMenu, onClose }: ReportsScreenProp
   }, [onClose]);
 
   // Query products for metrics with optimized schema
-  const { data } = db.useQuery(
-    currentStore?.id ? {
-      products: {
-        $: {
-          where: {
-            storeId: currentStore.id
-          },
-          order: {
-            createdAt: 'desc' // Use consistent field naming
-          }
-        },
-        brand: {}, // Include relationship data for better reporting
-        category: {},
-        type: {},
-        vendor: {}
+  const { data } = db.useQuery({
+    products: {
+      $: {
+        order: {
+          createdAt: 'desc' // Use consistent field naming
+        }
       },
-      collections: {
-        $: {
-          where: {
-            storeId: currentStore.id
-          },
-          order: {
-            name: 'asc' // Use indexed field for ordering
-          }
+      brand: {}, // Include relationship data for better reporting
+      category: {},
+      type: {},
+      vendor: {}
+    },
+    collections: {
+      $: {
+        order: {
+          name: 'asc' // Use indexed field for ordering
         }
       }
-    } : { products: {}, collections: {} }
-  );
+    }
+  });
 
   const products = data?.products || [];
   const collections = data?.collections || [];

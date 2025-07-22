@@ -50,7 +50,6 @@ const ORDER_FILTERS = [
 
 export default function OrdersScreen({ onCreateOrder, onOrderSelect, onClose }: OrdersScreenProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
   const [showLocationFilter, setShowLocationFilter] = useState(false);

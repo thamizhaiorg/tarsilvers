@@ -76,7 +76,6 @@ export default function CustomerSelect({ selectedCustomer, onCustomerSelect, onC
     try {
       const customerId = id();
       const customerData = {
-        storeId: currentStore.id,
         name: newCustomerData.name.trim(),
         email: newCustomerData.email.trim() || undefined,
         phone: newCustomerData.phone.trim() || undefined,

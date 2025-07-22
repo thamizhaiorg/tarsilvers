@@ -103,11 +103,6 @@ export default function FileUpload({
   };
 
   const generateR2Path = (fileName: string, fileType: string): string => {
-    if (!currentStore) return `files/${fileName}`;
-    
-    // Sanitize store ID
-    const sanitizedStoreId = currentStore.id.replace(/[^a-zA-Z0-9]/g, '');
-    
     // Determine category based on reference or file type
     let category = 'general';
     if (reference) {
@@ -121,14 +116,14 @@ export default function FileUpload({
     } else {
       category = 'documents';
     }
-    
+
     // Generate random number for uniqueness
     const randomNumber = Math.floor(Math.random() * 1000000000);
-    
+
     // Clean filename
     const cleanFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, '').toLowerCase();
-    
-    return `${sanitizedStoreId}/${category}/${randomNumber}/${cleanFileName}`;
+
+    return `files/${category}/${randomNumber}/${cleanFileName}`;
   };
 
   const uploadFile = async (file: any) => {

@@ -45,18 +45,10 @@ export default function Locations({ onClose }: LocationsProps) {
   }, []); // No dependency on currentStore since it no longer exists
 
   const loadLocations = async () => {
-    if (!currentStore) return;
-
     try {
       setLoading(true);
       const result = await db.queryOnce({
-        locations: {
-          $: {
-            where: {
-              storeId: currentStore.id
-            }
-          }
-        }
+        locations: {}
       });
 
       setLocations(result.data?.locations || []);

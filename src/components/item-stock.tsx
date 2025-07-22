@@ -81,7 +81,7 @@ export default function ItemStock({ item, onClose, onSave }: ItemStockProps) {
           location: {}
         },
         locations: {
-          $: { where: { storeId: currentStore?.id || '', isActive: true } }
+          $: { where: { isActive: true } }
         }
       });
 

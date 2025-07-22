@@ -147,7 +147,6 @@ export default function OrderCreate({ onClose, onOrderCreated }: OrderCreateProp
       const orderNumber = generateOrderNumber();
       
       const orderData = {
-        storeId: currentStore.id,
         orderNumber,
         referid: orderId,
         createdat: new Date(),
@@ -191,7 +190,6 @@ export default function OrderCreate({ onClose, onOrderCreated }: OrderCreateProp
           taxAmount: (item.lineTotal * 0.08),
           discountAmount: 0,
           lineTotal: item.lineTotal,
-          storeId: currentStore.id,
           productImage: item.productImage,
           fulfillmentStatus: 'unfulfilled'
         });

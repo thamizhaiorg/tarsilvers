@@ -64,7 +64,6 @@ export default function QuickOrderPOS({ onClose, onOrderComplete }: QuickOrderPO
       vendor: {},
       $: {
         where: {
-          storeId: currentStore?.id || '',
           pos: true,
           status: 'active' // Filter for active products only
         },
@@ -167,15 +166,14 @@ export default function QuickOrderPOS({ onClose, onOrderComplete }: QuickOrderPO
 
   // Process payment
   const processPayment = async () => {
-    if (cart.length === 0 || !currentStore?.id) return;
+    if (cart.length === 0) return;
 
     setIsProcessing(true);
     try {
       const orderId = id();
       const orderNumber = `#${1000 + Math.floor(Math.random() * 9000)}`;
-      
+
       const orderData = {
-        storeId: currentStore.id,
         orderNumber,
         referid: orderId,
         createdat: Date.now(),
@@ -209,7 +207,6 @@ export default function QuickOrderPOS({ onClose, onOrderComplete }: QuickOrderPO
           taxAmount: Math.round(item.total * 0.08 * 100) / 100,
           discountAmount: 0,
           lineTotal: item.total,
-          storeId: currentStore.id,
           productImage: item.image,
           fulfillmentStatus: 'fulfilled'
         });

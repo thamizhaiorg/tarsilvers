@@ -24,7 +24,6 @@ interface InventoryLocationsProps {
 
 export default function InventoryLocations({ onClose }: InventoryLocationsProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);

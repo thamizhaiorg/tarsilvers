@@ -69,21 +69,17 @@ export default function InventoryHistory({ onClose, itemFilter }: InventoryHisto
 
   useEffect(() => {
     loadAdjustments();
-  }, [currentStore, itemFilter]);
+  }, [itemFilter]);
 
   useEffect(() => {
     filterAdjustments();
   }, [adjustments, searchQuery, selectedFilter]);
 
   const loadAdjustments = async () => {
-    if (!currentStore) return;
-
     try {
       setLoading(true);
-      
-      const whereClause: any = {
-        storeId: currentStore.id
-      };
+
+      const whereClause: any = {};
 
       if (itemFilter) {
         whereClause.itemId = itemFilter;
