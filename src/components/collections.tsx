@@ -47,6 +47,15 @@ export default function CollectionsScreen({ isGridView = false, onOpenForm, onCl
   });
 
   const collections = data?.collections || [];
+
+  // Debug logging
+  console.log('Collections query result:', {
+    isLoading,
+    error: error?.message,
+    collectionsCount: collections.length,
+    collections: collections.map(c => ({ id: c.id, name: c.name }))
+  });
+
   const filteredCollections = collections.filter((collection: any) =>
     collection.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );

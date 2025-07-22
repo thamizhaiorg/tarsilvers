@@ -20,7 +20,7 @@ interface CollectionFormScreenProps {
 
 export default function CollectionFormScreen({ collection, onClose, onSave }: CollectionFormScreenProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
+  const { isLoading: storeLoading } = useStore();
   const isEditing = !!collection;
 
   // Query collection with products relationship using optimized schema
@@ -109,7 +109,7 @@ export default function CollectionFormScreen({ collection, onClose, onSave }: Co
       try {
         const { data: existingCollections } = await db.queryOnce({
           collections: {
-            $: { where: { name: formData.name.trim(), storeId: currentStore.id } }
+            $: { where: { name: formData.name.trim() } }
           }
         });
 
@@ -132,7 +132,6 @@ export default function CollectionFormScreen({ collection, onClose, onSave }: Co
         isActive: formData.isActive,
         // storefront field removed
         pos: formData.pos,
-        storeId: currentStore.id, // Required field that was missing
         updatedAt: timestamp,
         ...(isEditing ? {} : { createdAt: timestamp }),
       };
@@ -144,8 +143,10 @@ export default function CollectionFormScreen({ collection, onClose, onSave }: Co
         log.info('Collection updated successfully', 'CollectionForm', { collectionId: collection.id });
       } else {
         const newId = id();
+        console.log('Creating collection with data:', { newId, collectionData });
         await db.transact(db.tx.collections[newId].update(collectionData));
         log.info('Collection created successfully', 'CollectionForm', { collectionId: newId });
+        console.log('Collection creation transaction completed');
       }
 
       setHasChanges(false);

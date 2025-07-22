@@ -106,11 +106,6 @@ const ItemComponent = React.memo(({
           <Text className="text-base font-medium text-gray-900">
             {formatCurrency(item.price || 0)}
           </Text>
-          {item.totalOnHand !== undefined && (
-            <Text className="text-sm text-gray-500">
-              Stock: {item.totalOnHand || 0}
-            </Text>
-          )}
         </View>
       </View>
     </TouchableOpacity>
@@ -128,7 +123,7 @@ export default function ItemsScreen({ isGridView = false, onItemFormOpen, onItem
   // New state for enhanced search, filter, and view functionality
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedView, setSelectedView] = useState<'stock' | 'pricing' | 'image'>('stock');
+  // Removed selectedView state - no longer needed
   const [showPricingForm, setShowPricingForm] = useState(false);
   const [selectedItemForPricing, setSelectedItemForPricing] = useState<any>(null);
 
@@ -149,9 +144,6 @@ export default function ItemsScreen({ isGridView = false, onItemFormOpen, onItem
         category: {},
         type: {},
         vendor: {}
-      },
-      ilocations: { // Use enhanced inventory location tracking
-        location: {}
       }
     }
   });
@@ -363,48 +355,7 @@ export default function ItemsScreen({ isGridView = false, onItemFormOpen, onItem
             </TouchableOpacity>
           </View>
 
-          {/* Fixed View Selection Bar */}
-          <View style={{
-            backgroundColor: '#fff',
-            borderBottomWidth: 1,
-            borderBottomColor: '#E5E7EB',
-          }}>
-            <View style={{
-              flexDirection: 'row',
-              backgroundColor: '#fff',
-            }}>
-              {[
-                { id: 'stock', label: 'Stock' },
-                { id: 'pricing', label: 'Pricing' },
-                { id: 'image', label: 'Image' }
-              ].map((view, index) => {
-                const isSelected = selectedView === view.id;
-                return (
-                  <TouchableOpacity
-                    key={view.id}
-                    onPress={() => setSelectedView(view.id as 'stock' | 'pricing' | 'image')}
-                    style={{
-                      flex: 1,
-                      paddingVertical: 16,
-                      backgroundColor: '#fff',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRightWidth: index < 2 ? 1 : 0,
-                      borderRightColor: '#E5E7EB',
-                    }}
-                  >
-                    <Text style={{
-                      fontSize: 14,
-                      color: isSelected ? '#3B82F6' : '#6B7280',
-                      fontWeight: isSelected ? '600' : '500',
-                    }}>
-                      {view.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
+
 
           {/* Fixed Filter Options */}
           {showFilters && (() => {
@@ -499,79 +450,24 @@ export default function ItemsScreen({ isGridView = false, onItemFormOpen, onItem
                     )}
                   </View>
                   <View style={{ alignItems: 'flex-end' }}>
-                    {selectedView === 'stock' && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          if (onItemFormOpen) {
-                            onItemFormOpen({ ...item, openInventory: true });
-                          }
-                        }}
-                        style={{
-                          backgroundColor: '#F9FAFB',
-                          paddingHorizontal: 10,
-                          paddingVertical: 6,
-                          borderRadius: 6,
-                          minWidth: 50,
-                          alignItems: 'center',
-                        }}
-                      >
-                        <Text style={{ fontSize: 15, fontWeight: '600', color: '#111827' }}>
-                          {(() => {
-                            // Use enhanced inventory location tracking
-                            const totalStock = item.ilocations?.reduce((sum: number, location: any) => 
-                              sum + (location.onHand || 0), 0) || item.totalOnHand || item.onhand || 0;
-                            return totalStock;
-                          })()}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-                    {selectedView === 'pricing' && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          setSelectedItemForPricing(item);
-                          setShowPricingForm(true);
-                        }}
-                        style={{
-                          backgroundColor: '#F9FAFB',
-                          paddingHorizontal: 10,
-                          paddingVertical: 6,
-                          borderRadius: 6,
-                          minWidth: 60,
-                          alignItems: 'center',
-                        }}
-                      >
-                        <Text style={{ fontSize: 15, fontWeight: '600', color: '#111827' }}>
-                          ${(item.saleprice || item.price || 0).toFixed(2)}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-                    {selectedView === 'image' && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          Alert.alert('Image', 'Item image functionality coming soon');
-                        }}
-                        style={{
-                          width: 40,
-                          height: 40,
-                          backgroundColor: '#F9FAFB',
-                          borderRadius: 6,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {item.image ? (
-                          <R2Image
-                            url={item.image}
-                            style={{ width: '100%', height: '100%', borderRadius: 6 }}
-                            fallback={
-                              <MaterialIcons name="image" size={20} color="#9CA3AF" />
-                            }
-                          />
-                        ) : (
-                          <MaterialIcons name="image" size={20} color="#9CA3AF" />
-                        )}
-                      </TouchableOpacity>
-                    )}
+                    <TouchableOpacity
+                      onPress={() => {
+                        setSelectedItemForPricing(item);
+                        setShowPricingForm(true);
+                      }}
+                      style={{
+                        backgroundColor: '#F9FAFB',
+                        paddingHorizontal: 10,
+                        paddingVertical: 6,
+                        borderRadius: 6,
+                        minWidth: 60,
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#111827' }}>
+                        ${(item.saleprice || item.price || 0).toFixed(2)}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>

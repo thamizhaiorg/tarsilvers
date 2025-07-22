@@ -771,11 +771,6 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
           price: formData.price || 0,
           saleprice: formData.saleprice || 0,
           cost: formData.cost || 0,
-          available: 0,
-          onhand: 0,
-          committed: 0,
-          unavailable: 0,
-          reorderlevel: 0,
         };
 
         // Assign option values to option1, option2, option3
@@ -788,30 +783,6 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
           db.tx.items[itemId].update(itemData),
           db.tx.items[itemId].link({ product: product.id })
         ]);
-
-        // Create default location stock record
-        try {
-          const defaultLocationId = await createDefaultLocation('default', 'Main Location');
-          const itemLocationId = id();
-          const timestamp = new Date().toISOString();
-
-          await db.transact([
-            db.tx.ilocations[itemLocationId].update({
-              itemId: itemId,
-              locationId: defaultLocationId,
-              onHand: 0,
-              committed: 0,
-              unavailable: 0,
-              createdAt: timestamp,
-              updatedAt: timestamp
-            })
-          ]);
-
-          console.log(`Created location stock for item: ${itemId}`);
-        } catch (error) {
-          console.error('Failed to create default location stock for item:', itemId, error);
-          // Don't fail item creation if location stock creation fails
-        }
 
         return Promise.resolve();
       });
@@ -915,11 +886,6 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
           price: formData.price || 0,
           saleprice: formData.saleprice || 0,
           cost: formData.cost || 0,
-          available: 0,
-          onhand: 0,
-          committed: 0,
-          unavailable: 0,
-          reorderlevel: 0,
         };
 
         // Assign option values to option1, option2, option3
@@ -932,30 +898,6 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
           db.tx.items[itemId].update(itemData),
           db.tx.items[itemId].link({ product: product.id })
         ]);
-
-        // Create default location stock record
-        try {
-          const defaultLocationId = await createDefaultLocation('default', 'Main Location');
-          const itemLocationId = id();
-          const timestamp = new Date().toISOString();
-
-          await db.transact([
-            db.tx.ilocations[itemLocationId].update({
-              itemId: itemId,
-              locationId: defaultLocationId,
-              onHand: 0,
-              committed: 0,
-              unavailable: 0,
-              createdAt: timestamp,
-              updatedAt: timestamp
-            })
-          ]);
-
-          console.log(`Created location stock for item: ${itemId}`);
-        } catch (error) {
-          console.error('Failed to create default location stock for item:', itemId, error);
-          // Don't fail item creation if location stock creation fails
-        }
 
         // Update progress
         completedItems++;
@@ -1086,41 +1028,12 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
         price: formData.price || 0,
         saleprice: formData.saleprice || 0,
         cost: formData.cost || 0,
-        available: 0,
-        onhand: 0,
-        committed: 0,
-        unavailable: 0,
-        reorderlevel: 0,
       };
 
       await db.transact([
         db.tx.items[itemId].update(itemData),
         db.tx.items[itemId].link({ product: productId })
       ]);
-
-      // Create default location stock record
-      try {
-        const defaultLocationId = await createDefaultLocation('default', 'Main Location');
-        const itemLocationId = id();
-        const timestamp = new Date().toISOString();
-
-        await db.transact([
-          db.tx.ilocations[itemLocationId].update({
-            itemId: itemId,
-            locationId: defaultLocationId,
-            onHand: 0,
-            committed: 0,
-            unavailable: 0,
-              createdAt: timestamp,
-              updatedAt: timestamp
-          })
-        ]);
-
-        log.info('Created location stock for single item', 'ProdForm', { itemId });
-      } catch (error) {
-        trackError(error as Error, 'ProdForm', { operation: 'createLocationStock', itemId });
-        // Don't fail item creation if location stock creation fails
-      }
     } catch (error) {
       trackError(error as Error, 'ProdForm', { operation: 'generateSingleItem' });
     }
@@ -1533,6 +1446,38 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
                 </Text>
                 <Text style={{ fontSize: 14, color: '#6B7280', marginTop: 2 }}>
                   {(() => {
+                    // Show selected option values from product.options
+                    if (product?.options) {
+                      try {
+                        const optionsData = typeof product.options === 'string'
+                          ? JSON.parse(product.options)
+                          : product.options;
+
+                        if (Array.isArray(optionsData) && optionsData.length > 0) {
+                          // Count total selected values across all groups
+                          const totalValues = optionsData.reduce((sum, group) => {
+                            return sum + (group.values ? group.values.length : 0);
+                          }, 0);
+
+                          // Get first few option values to display
+                          const allValues = optionsData.flatMap(group => group.values || []);
+                          const displayValues = allValues.slice(0, 3).map(v => v.name).join(', ');
+                          const remainingCount = Math.max(0, totalValues - 3);
+
+                          if (totalValues === 0) {
+                            return 'No option values selected';
+                          }
+
+                          return remainingCount > 0
+                            ? `${displayValues} +${remainingCount} more (${totalValues} total)`
+                            : `${displayValues} (${totalValues} total)`;
+                        }
+                      } catch (error) {
+                        console.error('Error parsing product options:', error);
+                      }
+                    }
+
+                    // Fallback to showing option sets if no values are stored
                     const optionSets = optionSetsData?.opsets || [];
                     const productOptionSets = optionSets.filter(set =>
                       selectedOptionSets.includes(set.id)
@@ -2941,6 +2886,7 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
       <OptionValuesSelector
         visible={showOptionValuesSelector}
         optionSet={currentOptionSet}
+        productOptions={product?.options}
         onClose={() => {
           setShowOptionValuesSelector(false);
           setCurrentOptionSet(null);

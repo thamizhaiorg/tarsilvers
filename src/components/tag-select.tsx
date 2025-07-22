@@ -43,20 +43,15 @@ export default function TagSelect({ selectedTags = [], onSelect, onClose }: TagS
   }, [onClose]);
 
   // Query tags from database with optimized schema
-  const { isLoading, error, data } = db.useQuery(
-    currentStore?.id ? {
-      tags: {
-        $: {
-          where: {
-            storeId: currentStore.id
-          },
-          order: {
-            name: 'asc' // Use indexed field for ordering
-          }
+  const { isLoading, error, data } = db.useQuery({
+    tags: {
+      $: {
+        order: {
+          name: 'asc' // Use indexed field for ordering
         }
       }
-    } : null
-  );
+    }
+  });
 
   const tags: TagItem[] = (data?.tags || []).map(tag => ({
     ...tag,

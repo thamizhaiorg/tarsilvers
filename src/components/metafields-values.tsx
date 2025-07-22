@@ -22,7 +22,7 @@ export default function MetafieldValues({
   showHeader = true 
 }: MetafieldValuesProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
+  const { isLoading: storeLoading } = useStore();
   const [definitions, setDefinitions] = useState<MetafieldSet[]>([]);
   const [values, setValues] = useState<Record<string, MetafieldValue>>({});
   const [showValueModal, setShowValueModal] = useState(false);
@@ -132,7 +132,6 @@ export default function MetafieldValues({
         setId: setId,
         entityId: entityId,
         value: value,
-        storeId: currentStore.id,
         createdAt: existingValue ? Date.now() : Date.now(),
         updatedAt: Date.now(),
       };

@@ -21,7 +21,7 @@ export default function MetafieldDefinitions({
   showHeader = true 
 }: MetafieldDefinitionsProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
+  const { isLoading: storeLoading } = useStore();
   const [definitions, setDefinitions] = useState<MetafieldSet[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<string>('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -48,18 +48,15 @@ export default function MetafieldDefinitions({
   }, [selectedGroup, onClose]);
 
   // Query metafield sets for this category
-  const { data: metafieldsData } = db.useQuery(
-    currentStore?.id ? {
-      metasets: {
-        $: {
-          where: {
-            storeId: currentStore.id,
-            category: entityType
-          }
+  const { data: metafieldsData } = db.useQuery({
+    metasets: {
+      $: {
+        where: {
+          category: entityType
         }
       }
-    } : {}
-  );
+    }
+  });
 
   // Load definitions
   useEffect(() => {
@@ -112,8 +109,7 @@ export default function MetafieldDefinitions({
         order: editingDefinition ? editingDefinition.order : maxOrder + 1,
         inputConfig: definitionData.inputConfig || {},
         required: definitionData.required || false,
-        storeId: currentStore.id,
-        createdAt: editingDefinition ? Date.now() : Date.now(),
+        createdAt: editingDefinition ? editingDefinition.createdAt : Date.now(),
         updatedAt: Date.now(),
       };
 

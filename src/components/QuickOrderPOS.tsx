@@ -45,7 +45,7 @@ interface QuickOrderPOSProps {
 
 export default function QuickOrderPOS({ onClose, onOrderComplete }: QuickOrderPOSProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
+  const { isLoading: storeLoading } = useStore();
   
   // State
   const [searchQuery, setSearchQuery] = useState('');

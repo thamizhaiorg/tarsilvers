@@ -38,7 +38,7 @@ interface InventoryAdjustmentsProps {
 
 export default function InventoryAdjustments({ onClose, onNavigate }: InventoryAdjustmentsProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
+  const { isLoading: storeLoading } = useStore();
   const [itemLocations, setItemLocations] = useState<ItemLocation[]>([]);
   const [filteredItems, setFilteredItems] = useState<ItemLocation[]>([]);
   const [searchQuery, setSearchQuery] = useState('');

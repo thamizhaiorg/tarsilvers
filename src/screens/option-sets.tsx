@@ -18,22 +18,16 @@ interface OptionSetsScreenProps {
 }
 
 export default function OptionSetsScreen({ onNavigateToEdit, onClose }: OptionSetsScreenProps) {
-  const { currentStore } = useStore();
+  const { isLoading: storeLoading } = useStore();
   const insets = useSafeAreaInsets();
 
   // ...existing code...
 
   // Get option sets from database
-  const { data, isLoading, error } = db.useQuery(
-    currentStore?.id ? {
-      opsets: {
-        $: { where: { storeId: currentStore.id } }
-      },
-      opvalues: {
-        $: { where: { storeId: currentStore.id } }
-      }
-    } : {}
-  );
+  const { data, isLoading, error } = db.useQuery({
+    opsets: {},
+    opvalues: {}
+  });
 
   // Handle case where opsets table doesn't exist yet
   const safeData = React.useMemo(() => {
@@ -68,7 +62,6 @@ export default function OptionSetsScreen({ onNavigateToEdit, onClose }: OptionSe
       await db.transact([
         db.tx.opsets[setId].update({
           name: 'New Option Set',
-          storeId: currentStore.id,
         })
       ]);
 

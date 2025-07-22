@@ -21,6 +21,7 @@ interface OptionValuesSelector {
     name: string;
     values: any[];
   } | null;
+  productOptions?: string | any;
   onClose: () => void;
   onGenerate: (selectedValues: any[], optionSetData: any) => Promise<void>;
 }
@@ -28,6 +29,7 @@ interface OptionValuesSelector {
 export default function OptionValuesSelector({
   visible,
   optionSet,
+  productOptions,
   onClose,
   onGenerate
 }: OptionValuesSelector) {
@@ -36,16 +38,6 @@ export default function OptionValuesSelector({
   const [activeGroup, setActiveGroup] = useState<string>('');
 
   // ...existing code...
-
-  // Reset selection when option set changes
-  useEffect(() => {
-    if (optionSet) {
-      setSelectedValues([]);
-      setActiveGroup('');
-    }
-  }, [optionSet]);
-
-
 
   // Query option values for the current option set
   const { data: optionValuesData } = db.useQuery(
@@ -57,6 +49,46 @@ export default function OptionValuesSelector({
   );
 
   const optionValues = optionValuesData?.opvalues || [];
+
+  // Initialize selected values from product options when option set changes
+  useEffect(() => {
+    if (optionSet && optionValues.length > 0) {
+      // Try to find previously selected values for this option set
+      let initialSelectedValues: string[] = [];
+
+      if (productOptions) {
+        try {
+          const optionsData = typeof productOptions === 'string'
+            ? JSON.parse(productOptions)
+            : productOptions;
+
+          if (Array.isArray(optionsData)) {
+            // Find values that match this option set
+            const allStoredValues = optionsData.flatMap(group => group.values || []);
+
+            // Match stored values with current option values by name and identifier
+            initialSelectedValues = optionValues
+              .filter(optionValue =>
+                allStoredValues.some(storedValue =>
+                  storedValue.name === optionValue.name &&
+                  storedValue.identifier === optionValue.identifierValue
+                )
+              )
+              .map(optionValue => optionValue.id);
+          }
+        } catch (error) {
+          console.error('Error parsing product options for pre-selection:', error);
+        }
+      }
+
+      setSelectedValues(initialSelectedValues);
+      setActiveGroup('');
+    }
+  }, [optionSet, optionValues, productOptions]);
+
+
+
+
 
   // Group values by their group field
   const groupedValues = React.useMemo(() => {

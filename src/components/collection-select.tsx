@@ -26,7 +26,7 @@ interface CollectionItem {
 
 export default function CollectionSelect({ selectedCollection, onSelect, onClose }: CollectionSelectProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
+  const { isLoading: storeLoading } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [showBottomDrawer, setShowBottomDrawer] = useState(false);
   const [selectedCollectionForAction, setSelectedCollectionForAction] = useState<CollectionItem | null>(null);
@@ -46,20 +46,15 @@ export default function CollectionSelect({ selectedCollection, onSelect, onClose
   }, [onClose]);
 
   // Query collections from database with optimized schema
-  const { isLoading, error, data } = db.useQuery(
-    currentStore?.id ? {
-      collections: {
-        $: {
-          where: {
-            storeId: currentStore.id
-          },
-          order: {
-            name: 'asc' // Use indexed field for ordering
-          }
+  const { isLoading, error, data } = db.useQuery({
+    collections: {
+      $: {
+        order: {
+          name: 'asc' // Use indexed field for ordering
         }
       }
-    } : null
-  );
+    }
+  });
 
   const collections = data?.collections || [];
 
@@ -113,7 +108,6 @@ export default function CollectionSelect({ selectedCollection, onSelect, onClose
       const newCollectionId = id();
       const newCollection = {
         name: searchQuery.trim(),
-        storeId: currentStore.id,
         isActive: true,
         createdAt: timestamp,
         updatedAt: timestamp,

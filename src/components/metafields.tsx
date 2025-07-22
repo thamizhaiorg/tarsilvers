@@ -32,7 +32,7 @@ interface MetafieldsProps {
 
 export default function Metafields({ productId, onClose, showHeader = true }: MetafieldsProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
+  const { isLoading: storeLoading } = useStore();
   const [definitions, setDefinitions] = useState<MetafieldDefinition[]>([]);
   const [values, setValues] = useState<Record<string, any>>({});
   const [showAddModal, setShowAddModal] = useState(false);
@@ -70,12 +70,12 @@ export default function Metafields({ productId, onClose, showHeader = true }: Me
     return () => backHandler.remove();
   }, [onClose]);
 
-  // Query metafield definitions (using special parentid for definitions)
+  // Query metafield definitions (using special parentId for definitions)
   const { data: metafieldsData } = db.useQuery({
     metasets: {
       $: {
         where: {
-          parentid: 'metafield-definitions' // Special parentid for definitions
+          parentId: 'metafield-definitions' // Special parentId for definitions
         }
       }
     }
@@ -87,7 +87,7 @@ export default function Metafields({ productId, onClose, showHeader = true }: Me
       metasets: {
         $: {
           where: {
-            parentid: productId
+            parentId: productId
           }
         }
       }
@@ -126,7 +126,7 @@ export default function Metafields({ productId, onClose, showHeader = true }: Me
   }, [valuesData]);
 
   const addGroup = async () => {
-    if (!newGroupName.trim() || !currentStore?.id) {
+    if (!newGroupName.trim()) {
       Alert.alert('Error', 'Please enter a group name');
       return;
     }
@@ -154,14 +154,17 @@ export default function Metafields({ productId, onClose, showHeader = true }: Me
         await db.transact(
           db.tx.metasets[groupId].update({
             title: '__GROUP_PLACEHOLDER__',
+            name: '__GROUP_PLACEHOLDER__',
             type: '__GROUP__',
             group: newGroupName.trim(),
             order: 0,
             filter: false,
             config: {},
             value: '',
-            storeId: currentStore.id,
-            parentid: 'metafield-definitions'
+            parentId: 'metafield-definitions',
+            category: 'product',
+            createdAt: Date.now(),
+            updatedAt: Date.now()
           })
         );
       }
@@ -227,8 +230,10 @@ export default function Metafields({ productId, onClose, showHeader = true }: Me
           filter: newFieldData.filter,
           config: newFieldData.config,
           value: newFieldData.value,
-          storeId: currentStore.id,
-          parentid: 'metafield-definitions'
+          parentId: 'metafield-definitions',
+          category: 'product', // Add required category field
+          createdAt: Date.now(),
+          updatedAt: Date.now()
         })
       );
 
@@ -284,7 +289,7 @@ export default function Metafields({ productId, onClose, showHeader = true }: Me
   ];
 
   const updateValue = async (fieldName: string, value: any) => {
-    if (!productId || !currentStore?.id) return;
+    if (!productId) return;
 
     try {
       // Find existing value or create new
@@ -299,9 +304,13 @@ export default function Metafields({ productId, onClose, showHeader = true }: Me
         await db.transact(
           db.tx.metasets[valueId].update({
             title: fieldName,
+            name: fieldName,
+            type: 'text',
             value: value.toString(),
-            storeId: currentStore.id,
-            parentid: productId
+            parentId: productId,
+            category: 'product',
+            createdAt: Date.now(),
+            updatedAt: Date.now()
           })
         );
       }
