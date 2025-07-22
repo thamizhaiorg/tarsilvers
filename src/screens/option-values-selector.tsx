@@ -37,10 +37,8 @@ export default function OptionValuesSelector({
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
   const [activeGroup, setActiveGroup] = useState<string>('');
 
-  // ...existing code...
-
   // Query option values for the current option set
-  const { data: optionValuesData } = db.useQuery(
+  const { data: optionValuesQueryData } = db.useQuery(
     optionSet?.id ? {
       opvalues: {
         $: { where: { setId: optionSet.id } }
@@ -48,7 +46,7 @@ export default function OptionValuesSelector({
     } : {}
   );
 
-  const optionValues = optionValuesData?.opvalues || [];
+  const optionValues = optionValuesQueryData?.opvalues || [];
 
   // Initialize selected values from product options when option set changes
   useEffect(() => {
