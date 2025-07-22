@@ -31,7 +31,7 @@ export default function Card({
 
   return (
     <View
-      className={`bg-white ${getPaddingStyles()} ${className}`}
+      className={`bg-white rounded-xl border border-gray-100 ${getPaddingStyles()} ${className}`}
       style={style}
     >
       {children}
