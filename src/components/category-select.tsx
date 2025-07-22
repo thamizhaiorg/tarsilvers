@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { id } from '@instantdb/react-native';
 import { db } from '../lib/instant';
-import { useStore } from '../lib/store-context';
 
 interface CategorySelectProps {
   selectedCategory?: string;
@@ -16,12 +15,10 @@ interface CategoryItem {
   id: string;
   name: string;
   parent?: string;
-  storeId: string;
 }
 
 export default function CategorySelect({ selectedCategory, onSelect, onClose }: CategorySelectProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [showBottomDrawer, setShowBottomDrawer] = useState(false);
   const [selectedCategoryForAction, setSelectedCategoryForAction] = useState<CategoryItem | null>(null);
@@ -102,7 +99,6 @@ export default function CategorySelect({ selectedCategory, onSelect, onClose }: 
     try {
       const newCategory = {
         name: searchQuery.trim(),
-        storeId: currentStore.id,
       };
 
       const categoryId = id();

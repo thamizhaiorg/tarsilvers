@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { id } from '@instantdb/react-native';
 import { db } from '../lib/instant';
-import { useStore } from '../lib/store-context';
 
 interface BrandSelectProps {
   selectedBrand?: string;
@@ -15,12 +14,10 @@ interface BrandSelectProps {
 interface BrandItem {
   id: string;
   name: string;
-  storeId: string;
 }
 
 export default function BrandSelect({ selectedBrand, onSelect, onClose }: BrandSelectProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [showBottomDrawer, setShowBottomDrawer] = useState(false);
   const [selectedBrandForAction, setSelectedBrandForAction] = useState<BrandItem | null>(null);

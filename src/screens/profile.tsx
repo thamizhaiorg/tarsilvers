@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
-import { Image } from 'expo-image';
-import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../lib/auth-context';
-import { r2Service } from '../lib/r2-service';
 
 interface ProfileScreenProps {
   onClose: () => void;
@@ -17,14 +14,12 @@ export default function ProfileScreen({ onClose }: ProfileScreenProps) {
   
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [displayImageUrl, setDisplayImageUrl] = useState<string>('');
-  
+
   // Form state
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     bio: '',
-    profileImage: '',
   });
 
   // Initialize form data when profile loads
@@ -34,88 +29,11 @@ export default function ProfileScreen({ onClose }: ProfileScreenProps) {
         name: peopleaProfile.name || '',
         phone: peopleaProfile.phone || '',
         bio: peopleaProfile.bio || '',
-        profileImage: peopleaProfile.profileImage || '',
       });
     }
   }, [peopleaProfile]);
 
-  // Handle profile image URL generation
-  useEffect(() => {
-    const imageUrl = formData.profileImage || peopleaProfile?.profileImage;
-    if (imageUrl) {
-      if (imageUrl.includes('r2.cloudflarestorage.com')) {
-        const generateSignedUrl = async () => {
-          try {
-            const key = r2Service.extractKeyFromUrl(imageUrl);
-            if (key) {
-              const signedUrl = await r2Service.getSignedUrl(key, 3600);
-              if (signedUrl) {
-                setDisplayImageUrl(signedUrl);
-                Image.prefetch(signedUrl);
-              } else {
-                setDisplayImageUrl(imageUrl);
-              }
-            } else {
-              setDisplayImageUrl(imageUrl);
-            }
-          } catch (error) {
-            setDisplayImageUrl(imageUrl);
-          }
-        };
-        generateSignedUrl();
-      } else {
-        setDisplayImageUrl(imageUrl);
-        if (imageUrl) {
-          Image.prefetch(imageUrl);
-        }
-      }
-    } else {
-      setDisplayImageUrl('');
-    }
-  }, [formData.profileImage, peopleaProfile?.profileImage]);
 
-  const handleImagePicker = async () => {
-    try {
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (permissionResult.granted === false) {
-        Alert.alert('Permission Required', 'Permission to access camera roll is required!');
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        setIsLoading(true);
-        try {
-          const asset = result.assets[0];
-          const uploadResult = await r2Service.uploadFile(asset.uri, `profile-images/${user?.id}-${Date.now()}.jpg`);
-          
-          if (uploadResult.success && uploadResult.url) {
-            setFormData(prev => ({
-              ...prev,
-              profileImage: uploadResult.url
-            }));
-          } else {
-            Alert.alert('Upload Failed', 'Failed to upload profile image');
-          }
-        } catch (error) {
-          console.error('Image upload error:', error);
-          Alert.alert('Upload Error', 'An error occurred while uploading the image');
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    } catch (error) {
-      console.error('Image picker error:', error);
-      Alert.alert('Error', 'An error occurred while selecting the image');
-    }
-  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -166,7 +84,6 @@ export default function ProfileScreen({ onClose }: ProfileScreenProps) {
         name: peopleaProfile.name || '',
         phone: peopleaProfile.phone || '',
         bio: peopleaProfile.bio || '',
-        profileImage: peopleaProfile.profileImage || '',
       });
     }
     setIsEditing(false);
@@ -205,39 +122,6 @@ export default function ProfileScreen({ onClose }: ProfileScreenProps) {
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="px-6 py-8">
-          {/* Profile Image Section */}
-          <View className="items-center mb-8">
-            <TouchableOpacity
-              onPress={isEditing ? handleImagePicker : undefined}
-              disabled={!isEditing || isLoading}
-              className="relative"
-            >
-              <View className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200">
-                <Image
-                  source={
-                    displayImageUrl && displayImageUrl.length > 0
-                      ? { uri: displayImageUrl }
-                      : require('../../assets/adaptive-icon.png')
-                  }
-                  style={{ width: '100%', height: '100%' }}
-                  contentFit="cover"
-                  cachePolicy="memory-disk"
-                />
-              </View>
-              {isEditing && (
-                <View className="absolute -bottom-1 -right-1 w-8 h-8 bg-blue-600 rounded-full items-center justify-center border-2 border-white">
-                  <Feather name="camera" size={14} color="white" />
-                </View>
-              )}
-            </TouchableOpacity>
-            
-            {isEditing && (
-              <Text className="text-sm text-gray-500 mt-2 text-center">
-                Tap to change profile photo
-              </Text>
-            )}
-          </View>
-
           {/* User Info */}
           <View className="mb-8">
             <Text className="text-sm font-medium text-gray-500 mb-1">Email</Text>
@@ -318,13 +202,6 @@ export default function ProfileScreen({ onClose }: ProfileScreenProps) {
                 Sign Out
               </Text>
             </TouchableOpacity>
-          </View>
-
-          {/* App Info */}
-          <View className="mt-8 pt-6 border-t border-gray-100">
-            <Text className="text-xs text-gray-400 text-center">
-              TAR POS • Powered by InstantDB
-            </Text>
           </View>
         </View>
       </ScrollView>

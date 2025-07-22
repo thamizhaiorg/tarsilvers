@@ -209,7 +209,7 @@ export default function OrdersScreen({ onCreateOrder, onOrderSelect, onClose }: 
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
       {/* Search Bar - Following products screen pattern */}
       <View className="bg-white px-4 py-3">
         <View className="flex-row items-center">

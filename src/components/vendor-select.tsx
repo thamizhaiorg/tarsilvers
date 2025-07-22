@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { id } from '@instantdb/react-native';
 import { db } from '../lib/instant';
-import { useStore } from '../lib/store-context';
 
 interface VendorSelectProps {
   selectedVendor?: string;
@@ -15,7 +14,6 @@ interface VendorSelectProps {
 interface VendorItem {
   id: string;
   name: string;
-  storeId: string;
 }
 
 export default function VendorSelect({ selectedVendor, onSelect, onClose }: VendorSelectProps) {
@@ -100,7 +98,6 @@ export default function VendorSelect({ selectedVendor, onSelect, onClose }: Vend
     try {
       const newVendor = {
         name: searchQuery.trim(),
-        storeId: currentStore.id,
       };
 
       const vendorId = id();

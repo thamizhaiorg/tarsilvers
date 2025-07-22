@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, BackHandler, Alert, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useStore } from '../lib/store-context';
+
 import { db } from '../lib/instant';
 import { id } from '@instantdb/react-native';
-import { updateItemTotals, createInventoryAdjustment, getStoreLocations } from '../lib/inventory-setup';
+import { updateItemTotals, createInventoryAdjustment, getActiveLocations } from '../lib/inventory-setup';
 
 interface Item {
   id: string;
@@ -72,8 +72,8 @@ export default function EditItemLocations({ item, itemLocations, onClose }: Edit
     try {
       setLoading(true);
       
-      // Get all locations for the store
-      const storeLocations = await getStoreLocations(currentStore.id);
+      // Get all active locations
+      const storeLocations = await getActiveLocations();
       setLocations(storeLocations);
 
       // Initialize stock levels
@@ -164,7 +164,6 @@ export default function EditItemLocations({ item, itemLocations, onClose }: Edit
               db.tx.itemLocations[itemLocationId].update({
                 itemId: item.id,
                 locationId: locationId,
-                storeId: currentStore!.id,
                 onHand: current.onHand,
                 committed: current.committed,
                 unavailable: current.unavailable,
@@ -178,7 +177,6 @@ export default function EditItemLocations({ item, itemLocations, onClose }: Edit
             await createInventoryAdjustment(
               item.id,
               locationId,
-              currentStore!.id,
               original.onHand,
               current.onHand,
               'adjustment',

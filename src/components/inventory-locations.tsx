@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, BackHandler, Alert, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useStore } from '../lib/store-context';
+
 import { db } from '../lib/instant';
 import { id } from '@instantdb/react-native';
 
@@ -42,24 +42,16 @@ export default function InventoryLocations({ onClose }: InventoryLocationsProps)
 
   useEffect(() => {
     loadLocations();
-  }, [currentStore]);
+  }, []);
 
   const loadLocations = async () => {
-    if (!currentStore) return;
-
     try {
       setLoading(true);
       const result = await db.queryOnce({
-        locations: {
-          $: {
-            where: {
-              storeId: currentStore.id
-            }
-          }
-        }
+        locations: {}
       });
 
-      setLocations(result.locations || []);
+      setLocations(result.data?.locations || []);
     } catch (error) {
       console.error('Failed to load locations:', error);
       Alert.alert('Error', 'Failed to load locations');
@@ -69,7 +61,7 @@ export default function InventoryLocations({ onClose }: InventoryLocationsProps)
   };
 
   const handleAddLocation = async () => {
-    if (!newLocationName.trim() || !currentStore) {
+    if (!newLocationName.trim()) {
       Alert.alert('Error', 'Please enter a location name');
       return;
     }
@@ -79,7 +71,6 @@ export default function InventoryLocations({ onClose }: InventoryLocationsProps)
       const timestamp = new Date().toISOString();
 
       const locationData = {
-        storeId: currentStore.id,
         name: newLocationName.trim(),
         type: newLocationType,
         isDefault: locations.length === 0, // First location is default

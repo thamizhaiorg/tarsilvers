@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { id } from '@instantdb/react-native';
 import { db } from '../lib/instant';
-import { useStore } from '../lib/store-context';
 
 interface TypeSelectProps {
   selectedType?: string;
@@ -16,12 +15,10 @@ interface TypeItem {
   id: string;
   name: string;
   parent?: string;
-  storeId: string;
 }
 
 export default function TypeSelect({ selectedType, onSelect, onClose }: TypeSelectProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [showBottomDrawer, setShowBottomDrawer] = useState(false);
   const [selectedTypeForAction, setSelectedTypeForAction] = useState<TypeItem | null>(null);
@@ -104,7 +101,6 @@ export default function TypeSelect({ selectedType, onSelect, onClose }: TypeSele
     try {
       const newType = {
         name: searchQuery.trim(),
-        storeId: currentStore.id,
       };
 
       const typeId = id();

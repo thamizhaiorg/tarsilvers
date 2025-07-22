@@ -396,7 +396,7 @@ export default function ProductsScreen({ isGridView = false, onProductFormOpen, 
   // Remove currentStore check since we're now using a single-store system
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
       {/* Search Bar with top and bottom borders - NO spacing above */}
       <View className="bg-white px-4 py-3">
         <View className="flex-row items-center">

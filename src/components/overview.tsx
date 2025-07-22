@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, BackHandler, FlatList, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useStore } from '../lib/store-context';
+
 import { db } from '../lib/instant';
 
 interface ItemWithStock {
@@ -35,7 +35,6 @@ interface OverviewProps {
 
 export default function Overview({ onClose, onNavigate }: OverviewProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [items, setItems] = useState<ItemWithStock[]>([]);
   const [filteredItems, setFilteredItems] = useState<ItemWithStock[]>([]);
   const [searchQuery, setSearchQuery] = useState('');

@@ -125,7 +125,7 @@ export default function CollectionsScreen({ isGridView = false, onOpenForm, onCl
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: insets.top }}>
       {/* Clean Search Bar - Adapted from prod-form.tsx */}
       <View style={{
         flexDirection: 'row',

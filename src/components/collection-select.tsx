@@ -17,7 +17,6 @@ interface CollectionItem {
   name: string;
   description?: string;
   parent?: string;
-  storeId: string;
   isActive: boolean;
   sortOrder?: number;
   createdAt: Date;

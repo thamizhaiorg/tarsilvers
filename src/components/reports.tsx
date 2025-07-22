@@ -14,6 +14,7 @@ interface ReportsScreenProps {
 }
 
 export default function ReportsScreen({ onOpenMenu, onClose }: ReportsScreenProps) {
+  const insets = useSafeAreaInsets();
 
   // Handle back navigation
   useEffect(() => {
@@ -75,7 +76,7 @@ export default function ReportsScreen({ onOpenMenu, onClose }: ReportsScreenProp
   ];
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-gray-50" style={{ paddingTop: insets.top }}>
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Dashboard Overview Header */}
         <View className="px-4 pt-6 pb-4 bg-white border-b border-gray-200">

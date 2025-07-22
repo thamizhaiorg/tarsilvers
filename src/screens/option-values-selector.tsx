@@ -43,7 +43,7 @@ export default function OptionValuesSelector({
   const { data: optionValuesData } = db.useQuery(
     optionSet?.id ? {
       opvalues: {
-        $: { where: { setId: optionSet.id } } // No store filtering needed
+        $: { where: { setId: optionSet.id } }
       }
     } : {}
   );

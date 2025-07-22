@@ -3,10 +3,11 @@ import { View, Text, TouchableOpacity, ScrollView, BackHandler, Modal } from 're
 import { useStore } from '../lib/store-context';
 import { useAuth } from '../lib/auth-context';
 import { db } from '../lib/instant';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import StoreForm from './store-form';
 import ComList from './comlist';
 
-type Screen = 'sales' | 'reports' | 'products' | 'collections' | 'options' | 'metafields' | 'menu' | 'items' | 'locations' | 'store-management' | 'orders';
+type Screen = 'sales' | 'reports' | 'products' | 'collections' | 'options' | 'metafields' | 'menu' | 'items' | 'locations' | 'store-management' | 'orders' | 'profile';
 
 interface WorkspaceProps {
   onNavigate: (screen: Screen) => void;
@@ -14,6 +15,8 @@ interface WorkspaceProps {
 }
 
 export default function Workspace({ onNavigate, onClose }: WorkspaceProps) {
+  const insets = useSafeAreaInsets();
+  const { peopleaProfile } = useAuth();
   const [showStoreForm, setShowStoreForm] = useState(false);
   const [showComList, setShowComList] = useState(false);
   const [salesMetrics, setSalesMetrics] = useState({ totalSales: 0, orderCount: 0 });
@@ -78,6 +81,8 @@ export default function Workspace({ onNavigate, onClose }: WorkspaceProps) {
       setShowComList(true);
     } else if (itemId === 'store') {
       onNavigate('store-management' as Screen);
+    } else if (itemId === 'profile') {
+      onNavigate('profile' as Screen);
     } else {
       onNavigate(itemId as Screen);
     }
@@ -107,9 +112,9 @@ export default function Workspace({ onNavigate, onClose }: WorkspaceProps) {
 
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        <View className="px-6 pt-6">
+        <View className="px-4 pt-6">
           {/* Space card removed */}
 
           {/* Commerce Card - Light White */}
@@ -118,16 +123,16 @@ export default function Workspace({ onNavigate, onClose }: WorkspaceProps) {
             style={{ minHeight: 504, borderRadius: 10, backgroundColor: '#F5F5F5' }}
           >
             <View className="flex-1">
-              {/* Header */}
+              {/* Header with Profile */}
               <View className="mb-4">
                 <View className="flex-row items-center justify-start mb-3">
                   <TouchableOpacity
-                    onPress={() => handleItemPress('store')}
+                    onPress={() => handleItemPress('profile')}
                     className="px-3 py-1 border border-gray-300"
                     style={{ borderRadius: 6 }}
                   >
                     <Text className="text-green-800 text-sm">
-                      Single Store
+                      {peopleaProfile?.name || 'Profile'}
                     </Text>
                   </TouchableOpacity>
                 </View>

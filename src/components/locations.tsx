@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, BackHandler, Alert, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useStore } from '../lib/store-context';
+
 import { db } from '../lib/instant';
 import { id } from '@instantdb/react-native';
 import LocationForm from './location-form';

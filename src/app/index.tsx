@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Text, View, TouchableOpacity, BackHandler, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { useAuth } from "../lib/auth-context";
 import { r2Service } from "../lib/r2-service";
 import AuthScreen from "../screens/auth";
@@ -444,31 +443,10 @@ export default function Page() {
     <StoreProvider>
       <ErrorBoundary>
         <View className="flex flex-1">
-          {currentScreen === 'sales' || currentScreen === 'options' || currentScreen === 'metafields' || currentScreen === 'items' || currentScreen === 'locations' || currentScreen === 'files' || currentScreen === 'profile' || currentScreen === 'orders' || isProductFormOpen || isCollectionFormOpen || isItemStockOpen ? (
-            // Full screen screens without header or bottom navigation (including product and collection forms)
-            <ErrorBoundary>
-              {renderMainContent()}
-            </ErrorBoundary>
-          ) : (
-            // All other screens with header only (bottom navigation removed)
-            <>
-              <Header
-                currentScreen={currentScreen}
-                onNavigate={handleNavigate}
-                isGridView={isGridView}
-                setIsGridView={setIsGridView}
-                showManagement={showManagement}
-                setShowManagement={setShowManagement}
-                productFormProduct={productFormProduct}
-                isProductFormOpen={isProductFormOpen}
-                collectionFormCollection={collectionFormCollection}
-                isCollectionFormOpen={isCollectionFormOpen}
-              />
-              <ErrorBoundary>
-                {renderMainContent()}
-              </ErrorBoundary>
-            </>
-          )}
+          {/* All screens now render without header */}
+          <ErrorBoundary>
+            {renderMainContent()}
+          </ErrorBoundary>
         </View>
       </ErrorBoundary>
     </StoreProvider>
@@ -476,8 +454,49 @@ export default function Page() {
 }
 
 function MenuScreen({ onNavigate }: { onNavigate: (screen: Screen) => void }) {
+  const insets = useSafeAreaInsets();
+  const { peopleaProfile } = useAuth();
+  const [displayImageUrl, setDisplayImageUrl] = useState<string>('');
+
+  // Set image URL immediately when profile is available
+  useEffect(() => {
+    if (peopleaProfile?.profileImage) {
+      // If it's an R2 URL, generate signed URL
+      if (peopleaProfile.profileImage.includes('r2.cloudflarestorage.com')) {
+        const generateSignedUrl = async () => {
+          try {
+            const key = r2Service.extractKeyFromUrl(peopleaProfile.profileImage);
+            if (key) {
+              const signedUrl = await r2Service.getSignedUrl(key, 3600);
+              if (signedUrl) {
+                setDisplayImageUrl(signedUrl);
+                // Prefetch the image to cache it
+                Image.prefetch(signedUrl);
+              } else {
+                setDisplayImageUrl(peopleaProfile.profileImage);
+              }
+            } else {
+              setDisplayImageUrl(peopleaProfile.profileImage);
+            }
+          } catch (error) {
+            // Keep using original URL on error
+            setDisplayImageUrl(peopleaProfile.profileImage);
+          }
+        };
+        generateSignedUrl();
+      } else {
+        // For non-R2 URLs, use directly
+        setDisplayImageUrl(peopleaProfile.profileImage);
+        // Prefetch non-R2 images too
+        Image.prefetch(peopleaProfile.profileImage);
+      }
+    } else {
+      setDisplayImageUrl('');
+    }
+  }, [peopleaProfile?.profileImage]);
+
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-gray-50" style={{ paddingTop: insets.top }}>
       {/* Header Section - Square POS Style */}
       <View className="bg-white px-6 pt-8 pb-6 border-b border-gray-200">
         <Text className="text-3xl font-bold text-gray-900 mb-2">
@@ -488,17 +507,97 @@ function MenuScreen({ onNavigate }: { onNavigate: (screen: Screen) => void }) {
         </Text>
       </View>
 
-      {/* Main Content */}
-      <View className="flex-1 px-6 pt-8">
-        {/* Quick Stats Cards */}
-        <View className="flex-row gap-4 mb-8">
-          <View className="flex-1 bg-white p-4 rounded-xl border border-gray-200">
-            <Text className="text-2xl font-bold text-gray-900">0</Text>
-            <Text className="text-sm text-gray-600">Total Products</Text>
-          </View>
-          <View className="flex-1 bg-white p-4 rounded-xl border border-gray-200">
-            <Text className="text-2xl font-bold text-gray-900">0</Text>
-            <Text className="text-sm text-gray-600">Collections</Text>
+      {/* Main Content with much more spacing */}
+      <View className="flex-1 px-6 pt-20">
+        {/* Commerce Card with Profile */}
+        <View
+          className="p-6 mb-8"
+          style={{ minHeight: 200, borderRadius: 10, backgroundColor: '#F5F5F5' }}
+        >
+          <View className="flex-1">
+            {/* Header with Profile */}
+            <View className="mb-4">
+              <View className="flex-row items-center justify-start mb-3">
+                <TouchableOpacity
+                  onPress={() => onNavigate('profile')}
+                  className="flex-row items-center px-3 py-1 border border-gray-300"
+                  style={{ borderRadius: 6 }}
+                >
+                  <View className="w-6 h-6 rounded-full overflow-hidden mr-2">
+                    <Image
+                      source={
+                        displayImageUrl && displayImageUrl.length > 0 && displayImageUrl !== ''
+                          ? { uri: displayImageUrl }
+                          : require('../../assets/adaptive-icon.png')
+                      }
+                      style={{ width: 24, height: 24 }}
+                      contentFit="cover"
+                      cachePolicy="memory-disk"
+                    />
+                  </View>
+                  <Text className="text-green-800 text-sm">
+                    {peopleaProfile?.name || 'Profile'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Sales Metrics */}
+            <View className="mb-6">
+              <View className="flex-row justify-between mb-4">
+                <View>
+                  <Text className="text-gray-600 text-sm">Total Sales</Text>
+                  <Text className="text-black text-2xl font-bold">$0</Text>
+                </View>
+                <TouchableOpacity onPress={() => onNavigate('orders')}>
+                  <Text className="text-gray-600 text-sm">Orders</Text>
+                  <Text className="text-black text-2xl font-bold">1</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* New Sale Button */}
+              <TouchableOpacity
+                onPress={() => onNavigate('sales')}
+                className="bg-black py-4 items-center mb-6"
+                style={{ borderRadius: 8 }}
+              >
+                <Text className="text-white text-lg font-medium">New Sale</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Bottom row with circles and arrow */}
+            <View className="flex-row items-center justify-between mt-auto">
+              <View className="flex-row">
+                <TouchableOpacity
+                  onPress={() => onNavigate('products')}
+                  className="w-12 h-12 bg-yellow-400 items-center justify-center mr-3"
+                  style={{ borderRadius: 24 }}
+                >
+                  <Text className="text-black text-xl font-bold">P</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => onNavigate('items')}
+                  className="w-12 h-12 bg-purple-400 items-center justify-center mr-3"
+                  style={{ borderRadius: 24 }}
+                >
+                  <Text className="text-black text-xl font-bold">I</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => onNavigate('reports')}
+                  className="w-12 h-12 bg-blue-400 items-center justify-center"
+                  style={{ borderRadius: 24 }}
+                >
+                  <Text className="text-black text-xl font-bold">R</Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity
+                onPress={() => onNavigate('sales')}
+                className="w-12 h-12 bg-black items-center justify-center"
+                style={{ borderRadius: 24 }}
+              >
+                <Text className="text-white text-xl">→</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -600,143 +699,4 @@ function MenuScreen({ onNavigate }: { onNavigate: (screen: Screen) => void }) {
   );
 }
 
-function Header({ currentScreen, onNavigate, isGridView, setIsGridView, showManagement, setShowManagement, productFormProduct, isProductFormOpen, collectionFormCollection, isCollectionFormOpen }: {
-  currentScreen: Screen;
-  onNavigate: (screen: Screen) => void;
-  isGridView: boolean;
-  setIsGridView: (isGrid: boolean) => void;
-  showManagement: boolean;
-  setShowManagement: (show: boolean) => void;
-  productFormProduct?: any;
-  isProductFormOpen?: boolean;
-  collectionFormCollection?: any;
-  isCollectionFormOpen?: boolean;
-}) {
-  const insets = useSafeAreaInsets();
-  const { peopleaProfile } = useAuth();
-  const [displayImageUrl, setDisplayImageUrl] = useState<string>('');
 
-  // Set image URL immediately when profile is available
-  useEffect(() => {
-    if (peopleaProfile?.profileImage) {
-      // If it's an R2 URL, generate signed URL
-      if (peopleaProfile.profileImage.includes('r2.cloudflarestorage.com')) {
-        const generateSignedUrl = async () => {
-          try {
-            const key = r2Service.extractKeyFromUrl(peopleaProfile.profileImage);
-            if (key) {
-              const signedUrl = await r2Service.getSignedUrl(key, 3600);
-              if (signedUrl) {
-                setDisplayImageUrl(signedUrl);
-                // Prefetch the image to cache it
-                Image.prefetch(signedUrl);
-              } else {
-                setDisplayImageUrl(peopleaProfile.profileImage);
-              }
-            } else {
-              setDisplayImageUrl(peopleaProfile.profileImage);
-            }
-          } catch (error) {
-            // Keep using original URL on error
-            setDisplayImageUrl(peopleaProfile.profileImage);
-          }
-        };
-        generateSignedUrl();
-      } else {
-        // For non-R2 URLs, use directly
-        setDisplayImageUrl(peopleaProfile.profileImage);
-        // Prefetch non-R2 images too
-        Image.prefetch(peopleaProfile.profileImage);
-      }
-    } else {
-      setDisplayImageUrl('');
-    }
-  }, [peopleaProfile?.profileImage]);
-
-  const getScreenInfo = (screen: Screen) => {
-    // If product form is open, show product title without "Products:" prefix
-    if (screen === 'products' && isProductFormOpen) {
-      const productTitle = productFormProduct?.title || '';
-      return {
-        title: productTitle,
-        icon: '📦'
-      };
-    }
-
-    // If collection form is open, show collection title without "Collections:" prefix
-    if (screen === 'collections' && isCollectionFormOpen) {
-      const collectionTitle = collectionFormCollection?.name || '';
-      return {
-        title: collectionTitle,
-        icon: '🏷️'
-      };
-    }
-
-    switch (screen) {
-      // Space screen removed
-      case 'menu':
-        return { title: 'Workspace', icon: '🏢' };
-      case 'products':
-        return { title: 'Products', icon: '📦' };
-      case 'collections':
-        return { title: 'Collections', icon: '🏷️' };
-      case 'options':
-        return { title: 'Options', icon: 'O' };
-      case 'metafields':
-        return { title: 'Metafields', icon: '#' };
-      case 'files':
-        return { title: 'Files', icon: '📁' };
-      // Storefront removed
-
-      case 'sales':
-        return { title: 'Sales', icon: '💰' };
-      case 'reports':
-        return { title: 'Reports', icon: '📈' };
-      default:
-        return { title: 'Square POS', icon: '☰' };
-    }
-  };
-
-  const screenInfo = getScreenInfo(currentScreen);
-
-  return (
-    <View style={{ paddingTop: insets.top }}>
-      <View className="px-4 h-16 flex items-center flex-row justify-between bg-white border-b border-gray-200">
-        <View className="flex-row items-center">
-          {currentScreen === 'menu' ? (
-            <>
-              <TouchableOpacity
-                onPress={() => onNavigate('profile')}
-                className="w-8 h-8 rounded-full overflow-hidden mr-2"
-              >
-                <Image
-                  source={
-                    displayImageUrl && displayImageUrl.length > 0 && displayImageUrl !== ''
-                      ? { uri: displayImageUrl }
-                      : require('../../assets/adaptive-icon.png')
-                  }
-                  style={{ width: 32, height: 32 }}
-                  contentFit="cover"
-                  cachePolicy="memory-disk"
-                />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => onNavigate('menu')}>
-                <Text className="text-xl font-semibold text-gray-900">{screenInfo.title}</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <TouchableOpacity
-              onPress={() => onNavigate('menu')}
-              className="flex-row items-center"
-            >
-              <Text className="text-xl mr-2">{screenInfo.icon}</Text>
-              <Text className="text-xl font-semibold text-gray-900">{screenInfo.title}</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-
-      </View>
-    </View>
-  );
-}

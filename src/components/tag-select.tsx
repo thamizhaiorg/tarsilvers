@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { id } from '@instantdb/react-native';
 import { db, getCurrentTimestamp } from '../lib/instant';
-import { useStore } from '../lib/store-context';
 
 interface TagSelectProps {
   selectedTags?: string[];
@@ -15,14 +14,12 @@ interface TagSelectProps {
 interface TagItem {
   id: string;
   name: string;
-  storeId: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export default function TagSelect({ selectedTags = [], onSelect, onClose }: TagSelectProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [showBottomDrawer, setShowBottomDrawer] = useState(false);
   const [selectedTagForAction, setSelectedTagForAction] = useState<TagItem | null>(null);
@@ -85,14 +82,13 @@ export default function TagSelect({ selectedTags = [], onSelect, onClose }: TagS
   };
 
   const handleCreateTag = async () => {
-    if (!searchQuery.trim() || !currentStore?.id) return;
+    if (!searchQuery.trim()) return;
 
     try {
       const tagId = id();
       const timestamp = getCurrentTimestamp();
       await db.transact(db.tx.tags[tagId].update({
         name: searchQuery.trim(),
-        storeId: currentStore.id,
         createdAt: timestamp,
         updatedAt: timestamp,
       }));
