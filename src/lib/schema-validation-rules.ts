@@ -101,7 +101,6 @@ export const NUMERIC_VALIDATION_RULES: NumericValidationRule[] = [
 export const FIELD_VALIDATION_RULES: FieldValidationRule[] = [
   // Products entity
   { entity: 'products', field: 'title', type: 'string', required: true, indexed: true },
-  { entity: 'products', field: 'storeId', type: 'string', required: true, indexed: true },
   { entity: 'products', field: 'sku', type: 'string', required: false, indexed: true, unique: true },
   { entity: 'products', field: 'barcode', type: 'string', required: false, indexed: true },
   { entity: 'products', field: 'status', type: 'string', required: true, indexed: true, constraints: { enum: ['active', 'draft', 'archived'] } },
@@ -118,7 +117,6 @@ export const FIELD_VALIDATION_RULES: FieldValidationRule[] = [
   { entity: 'products', field: 'options', type: 'json', required: false },
   
   // Orders entity
-  { entity: 'orders', field: 'storeId', type: 'string', required: true, indexed: true },
   { entity: 'orders', field: 'orderNumber', type: 'string', required: true, indexed: true, unique: true },
   { entity: 'orders', field: 'referenceId', type: 'string', required: true, indexed: true, unique: true },
   { entity: 'orders', field: 'status', type: 'string', required: true, indexed: true, constraints: { enum: ['pending', 'processing', 'completed', 'cancelled'] } },
@@ -138,7 +136,6 @@ export const FIELD_VALIDATION_RULES: FieldValidationRule[] = [
   
   // Order items entity
   { entity: 'orderitems', field: 'orderId', type: 'string', required: true, indexed: true },
-  { entity: 'orderitems', field: 'storeId', type: 'string', required: true, indexed: true },
   { entity: 'orderitems', field: 'title', type: 'string', required: true },
   { entity: 'orderitems', field: 'quantity', type: 'number', required: true },
   { entity: 'orderitems', field: 'price', type: 'number', required: true },
@@ -154,22 +151,19 @@ export const FIELD_VALIDATION_RULES: FieldValidationRule[] = [
   { entity: 'inventory', field: 'reserved', type: 'number', required: false },
   
   // Customers entity
-  { entity: 'customers', field: 'storeId', type: 'string', required: true, indexed: true },
   { entity: 'customers', field: 'name', type: 'string', required: true },
   { entity: 'customers', field: 'email', type: 'string', required: false, indexed: true, constraints: { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ } },
   { entity: 'customers', field: 'phone', type: 'string', required: false, indexed: true },
   { entity: 'customers', field: 'createdAt', type: 'date', required: true, indexed: true },
   { entity: 'customers', field: 'addresses', type: 'json', required: false },
   { entity: 'customers', field: 'defaultAddress', type: 'json', required: false },
-  
+
   // Inventory locations entity
-  { entity: 'ilocations', field: 'storeId', type: 'string', required: true, indexed: true },
   { entity: 'ilocations', field: 'itemId', type: 'string', required: true, indexed: true },
   { entity: 'ilocations', field: 'locationId', type: 'string', required: true, indexed: true },
   { entity: 'ilocations', field: 'createdAt', type: 'date', required: true, indexed: true },
-  
+
   // Inventory adjustments entity
-  { entity: 'iadjust', field: 'storeId', type: 'string', required: true, indexed: true },
   { entity: 'iadjust', field: 'itemId', type: 'string', required: true, indexed: true },
   { entity: 'iadjust', field: 'locationId', type: 'string', required: true, indexed: true },
   { entity: 'iadjust', field: 'type', type: 'string', required: true, indexed: true, constraints: { enum: ['adjustment', 'sale', 'receive', 'transfer', 'count', 'damage', 'return'] } },

@@ -42,7 +42,6 @@ interface OrderCreateProps {
 
 export default function OrderCreate({ onClose, onOrderCreated }: OrderCreateProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [discountAmount, setDiscountAmount] = useState(0);

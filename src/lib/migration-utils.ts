@@ -108,10 +108,10 @@ export const TYPE_CONVERSIONS = {
 // Data validation rules
 export const VALIDATION_RULES = {
   required: {
-    products: ['title', 'storeId'],
-    orders: ['storeId', 'orderNumber', 'referenceId', 'subtotal', 'total'],
-    orderitems: ['orderId', 'storeId', 'title', 'quantity', 'price', 'lineTotal'],
-    customers: ['name', 'storeId'],
+    products: ['title'],
+    orders: ['orderNumber', 'referenceId', 'subtotal', 'total'],
+    orderitems: ['orderId', 'title', 'quantity', 'price', 'lineTotal'],
+    customers: ['name'],
   },
   
   nonNegative: [
@@ -131,9 +131,9 @@ export const VALIDATION_RULES = {
   ],
   
   unique: {
-    products: ['sku'], // Within store scope
+    products: ['sku'], // Global scope since no store filtering
     orders: ['orderNumber', 'referenceId'],
-    items: ['sku'], // Within store scope
+    items: ['sku'], // Global scope since no store filtering
   },
   
   email: ['email', 'customerEmail'],
@@ -283,7 +283,7 @@ export function transformRecords(entity: string, records: Record<string, any>[])
 /**
  * Create lookup tables for string-to-ID relationship conversions
  */
-export async function createRelationshipLookups(storeId: string): Promise<{
+export async function createRelationshipLookups(): Promise<{
   brands: Map<string, string>;
   categories: Map<string, string>;
   types: Map<string, string>;
@@ -297,17 +297,17 @@ export async function createRelationshipLookups(storeId: string): Promise<{
     vendors: new Map<string, string>(),
     collections: new Map<string, string>(),
   };
-  
+
   try {
-    // Fetch all reference entities for the store
+    // Fetch all reference entities
     const { data } = await db.query({
-      brands: { $: { where: { storeId } } },
-      categories: { $: { where: { storeId } } },
-      types: { $: { where: { storeId } } },
-      vendors: { $: { where: { storeId } } },
-      collections: { $: { where: { storeId } } },
+      brands: {},
+      categories: {},
+      types: {},
+      vendors: {},
+      collections: {},
     });
-    
+
     // Build lookup maps
     data.brands?.forEach(brand => lookups.brands.set(brand.name, brand.id));
     data.categories?.forEach(category => lookups.categories.set(category.name, category.id));

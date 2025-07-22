@@ -41,20 +41,16 @@ export default function CategorySelect({ selectedCategory, onSelect, onClose }: 
   }, [onClose]);
 
   // Query categories from database with optimized schema
-  const { isLoading, error, data } = db.useQuery(
-    currentStore?.id ? {
-      categories: {
-        $: {
-          where: {
-            storeId: currentStore.id
-          },
-          order: {
-            name: 'asc' // Use indexed field for ordering
-          }
+  const { isLoading, error, data } = db.useQuery({
+    categories: {
+      $: {
+        where: {}, // No store filtering needed
+        order: {
+          name: 'asc' // Use indexed field for ordering
         }
       }
-    } : null
-  );
+    }
+  });
 
   const categories = data?.categories || [];
 

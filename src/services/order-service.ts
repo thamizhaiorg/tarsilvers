@@ -36,7 +36,6 @@ export interface OrderItemData {
 }
 
 export interface OrderData {
-  storeId: string;
   orderNumber: string;
   referenceId: string;
   subtotal: number;
@@ -189,7 +188,6 @@ export class OrderService {
       // Create order with optimized schema fields
       const order = {
         id: newOrderId,
-        storeId: orderData.storeId,
         orderNumber: orderData.orderNumber,
         referenceId: orderData.referenceId,
         subtotal: orderData.subtotal,
@@ -215,7 +213,6 @@ export class OrderService {
       const orderItems = orderData.items.map(item => ({
         id: id(),
         orderId: newOrderId,
-        storeId: orderData.storeId,
         productId: item.productId,
         itemId: item.itemId,
         title: item.title,
@@ -369,7 +366,7 @@ export class OrderService {
   }
 
   // Generate unique order number
-  generateOrderNumber(storeId: string): string {
+  generateOrderNumber(): string {
     const timestamp = Date.now().toString().slice(-6);
     const random = Math.random().toString(36).substring(2, 5).toUpperCase();
     return `ORD-${timestamp}-${random}`;

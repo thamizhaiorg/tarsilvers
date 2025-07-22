@@ -40,20 +40,16 @@ export default function BrandSelect({ selectedBrand, onSelect, onClose }: BrandS
   }, [onClose]);
 
   // Query brands from database with optimized schema
-  const { isLoading, error, data } = db.useQuery(
-    currentStore?.id ? {
-      brands: {
-        $: {
-          where: {
-            storeId: currentStore.id
-          },
-          order: {
-            name: 'asc' // Use indexed field for ordering
-          }
+  const { isLoading, error, data } = db.useQuery({
+    brands: {
+      $: {
+        where: {}, // No store filtering needed
+        order: {
+          name: 'asc' // Use indexed field for ordering
         }
       }
-    } : null
-  );
+    }
+  });
 
   const brands = data?.brands || [];
 
@@ -105,7 +101,6 @@ export default function BrandSelect({ selectedBrand, onSelect, onClose }: BrandS
     try {
       const newBrand = {
         name: searchQuery.trim(),
-        storeId: currentStore.id,
       };
 
       const brandId = id();

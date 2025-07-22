@@ -72,9 +72,7 @@ export default function OrdersScreen({ onCreateOrder, onOrderSelect, onClose }: 
       customer: {},
       location: {}, // Use new location relationship
       $: {
-        where: {
-          storeId: currentStore?.id || '',
-        },
+        where: {}, // No store filtering needed since schema doesn't include storeId
         order: {
           createdAt: 'desc' // Use consistent field naming
         }

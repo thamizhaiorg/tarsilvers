@@ -41,20 +41,16 @@ export default function TypeSelect({ selectedType, onSelect, onClose }: TypeSele
   }, [onClose]);
 
   // Query types from database with optimized schema
-  const { isLoading, error, data } = db.useQuery(
-    currentStore?.id ? {
-      types: {
-        $: {
-          where: {
-            storeId: currentStore.id
-          },
-          order: {
-            name: 'asc' // Use indexed field for ordering
-          }
+  const { isLoading, error, data } = db.useQuery({
+    types: {
+      $: {
+        where: {}, // No store filtering needed
+        order: {
+          name: 'asc' // Use indexed field for ordering
         }
       }
-    } : null
-  );
+    }
+  });
 
   const types = data?.types || [];
 

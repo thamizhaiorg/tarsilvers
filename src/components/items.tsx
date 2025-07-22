@@ -119,7 +119,6 @@ const ItemComponent = React.memo(({
 
 export default function ItemsScreen({ isGridView = false, onItemFormOpen, onItemFormClose, onClose, productId }: ItemsScreenProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterStatus>('All');
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
@@ -139,8 +138,8 @@ export default function ItemsScreen({ isGridView = false, onItemFormOpen, onItem
     items: {
       $: {
         where: productId
-          ? { storeId: currentStore?.id || '', productId: productId }
-          : { storeId: currentStore?.id || '' },
+          ? { productId: productId }
+          : {}, // No store filtering needed since schema doesn't include storeId
         order: {
           sku: 'asc' // Use indexed field for ordering
         }

@@ -21,15 +21,12 @@ export interface UseFilesResult {
 }
 
 export function useFiles(options: UseFilesOptions = {}): UseFilesResult {
-  const { currentStore } = useStore();
   const { user } = db.useAuth();
 
-  // Query files for current store
-  const query = currentStore?.id ? {
-    files: {
-      $: { where: { storeId: currentStore.id } }
-    }
-  } : {};
+  // Query all files (no store filtering needed)
+  const query = {
+    files: {}
+  };
 
   // Removed debug log
 
@@ -40,7 +37,7 @@ export function useFiles(options: UseFilesOptions = {}): UseFilesResult {
   // Log files data for debugging
   useEffect(() => {
     // Removed debug logs
-  }, [allFiles.length, currentStore?.id, isLoading, error, options]);
+  }, [allFiles.length, isLoading, error, options]); // Removed currentStore dependency
 
   // Filter files based on options
   const files = useMemo(() => {
@@ -85,7 +82,6 @@ export function useFiles(options: UseFilesOptions = {}): UseFilesResult {
     }
 
     const fileUploadOptions = {
-      storeId: currentStore.id,
       userId: user.id,
       category: 'general',
       reference: uploadOptions.reference || options.reference || '',
@@ -152,14 +148,11 @@ export function useFiles(options: UseFilesOptions = {}): UseFilesResult {
 
 // Hook specifically for file selection/management
 export function useFileSelection() {
-  const { currentStore } = useStore();
   const { user } = db.useAuth();
 
-  const query = currentStore?.id ? {
-    files: {
-      $: { where: { storeId: currentStore.id } }
-    }
-  } : {};
+  const query = {
+    files: {} // No store filtering needed
+  };
 
   // Removed debug log
 
@@ -170,7 +163,7 @@ export function useFileSelection() {
   // Log file selection data for debugging
   useEffect(() => {
     // Removed debug logs
-  }, [files.length, currentStore?.id, isLoading, error]);
+  }, [files.length, isLoading, error]); // Removed currentStore dependency
 
   const getFilesByType = (type: 'images' | 'videos' | 'documents' | 'all') => {
     if (type === 'all') return files;

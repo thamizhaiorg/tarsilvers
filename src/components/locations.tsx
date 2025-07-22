@@ -25,7 +25,6 @@ interface LocationsProps {
 
 export default function Locations({ onClose }: LocationsProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [showLocationForm, setShowLocationForm] = useState(false);
@@ -43,7 +42,7 @@ export default function Locations({ onClose }: LocationsProps) {
 
   useEffect(() => {
     loadLocations();
-  }, [currentStore]);
+  }, []); // No dependency on currentStore since it no longer exists
 
   const loadLocations = async () => {
     if (!currentStore) return;

@@ -47,7 +47,6 @@ type TabType = 'keypad' | 'library' | 'favourites';
 
 export default function SquarePOS({ onClose, onOrderCreated }: SquarePOSProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [activeTab, setActiveTab] = useState<TabType>('library');
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -56,23 +55,20 @@ export default function SquarePOS({ onClose, onOrderCreated }: SquarePOSProps) {
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Query products that are active and POS-enabled, then get their items
-  const { data, isLoading } = db.useQuery(
-    currentStore?.id ? {
-      products: {
-        item: {},
-        $: {
-          where: {
-            storeId: currentStore.id,
-            pos: true,
-            status: 'active'
-          },
-          order: {
-            createdAt: 'desc'
-          }
+  const { data, isLoading } = db.useQuery({
+    products: {
+      item: {},
+      $: {
+        where: {
+          pos: true,
+          status: 'active'
+        },
+        order: {
+          createdAt: 'desc'
         }
       }
-    } : null
-  );
+    }
+  });
 
   // Debug query to see all products in the store (without filters)
   const { data: debugData } = db.useQuery(

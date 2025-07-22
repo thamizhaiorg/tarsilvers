@@ -115,7 +115,6 @@ const ProductItem = React.memo(({
 
 export default function ProductsScreen({ isGridView = false, onProductFormOpen, onProductFormClose, onClose }: ProductsScreenProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [showForm, setShowForm] = useState(false);
   const [showInventoryAdjustment, setShowInventoryAdjustment] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
@@ -128,23 +127,19 @@ export default function ProductsScreen({ isGridView = false, onProductFormOpen, 
 
   // Removed custom BackHandler logic to allow default navigation behavior
 
-  // Query products with their items filtered by current store
+  // Query products with their items (no store filtering needed)
   // Note: Relationship queries removed temporarily until relationships are properly established
-  const { isLoading, error, data } = db.useQuery(
-    currentStore?.id ? {
-      products: {
-        $: {
-          where: {
-            storeId: currentStore.id
-          },
-          order: {
-            createdAt: 'desc' // Use consistent field naming
-          }
-        },
-        item: {} // Keep item relationship as it's working
-      }
-    } : null // Don't query if no store selected
-  );
+  const { isLoading, error, data } = db.useQuery({
+    products: {
+      $: {
+        where: {}, // No store filtering needed
+        order: {
+          createdAt: 'desc' // Use consistent field naming
+        }
+      },
+      item: {} // Keep item relationship as it's working
+    }
+  });
 
   const products = data?.products || [];
 
@@ -398,15 +393,7 @@ export default function ProductsScreen({ isGridView = false, onProductFormOpen, 
     );
   }
 
-  if (!currentStore) {
-    return (
-      <EmptyState
-        icon="package"
-        title="No Products"
-        description="Start by adding your first product"
-      />
-    );
-  }
+  // Remove currentStore check since we're now using a single-store system
 
   return (
     <View className="flex-1 bg-white">

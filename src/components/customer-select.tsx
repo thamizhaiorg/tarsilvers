@@ -29,7 +29,6 @@ interface CustomerSelectProps {
 
 export default function CustomerSelect({ selectedCustomer, onCustomerSelect, onClose }: CustomerSelectProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddCustomer, setShowAddCustomer] = useState(false);
   const [isAddingCustomer, setIsAddingCustomer] = useState(false);
@@ -44,9 +43,7 @@ export default function CustomerSelect({ selectedCustomer, onCustomerSelect, onC
   const { data, isLoading, error } = db.useQuery({
     customers: {
       $: {
-        where: {
-          storeId: currentStore?.id || '',
-        },
+        where: {}, // No store filtering needed
         order: {
           createdAt: 'desc' // Use consistent field naming
         }

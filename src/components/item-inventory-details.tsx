@@ -8,7 +8,6 @@ import { getItemStock, updateItemTotals, createInventoryAdjustment } from '../li
 
 interface Item {
   id: string;
-  storeId: string;
   productId: string;
   sku: string;
   barcode?: string;
@@ -45,7 +44,6 @@ interface ItemInventoryDetailsProps {
 
 export default function ItemInventoryDetails({ item, onClose, onNavigate }: ItemInventoryDetailsProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [itemData, setItemData] = useState<Item>(item);
   const [itemLocations, setItemLocations] = useState<ItemLocation[]>([]);
   const [loading, setLoading] = useState(true);

@@ -43,7 +43,6 @@ interface InventoryHistoryProps {
 
 export default function InventoryHistory({ onClose, itemFilter }: InventoryHistoryProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [adjustments, setAdjustments] = useState<InventoryAdjustment[]>([]);
   const [filteredAdjustments, setFilteredAdjustments] = useState<InventoryAdjustment[]>([]);
   const [searchQuery, setSearchQuery] = useState('');

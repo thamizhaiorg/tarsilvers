@@ -14,7 +14,6 @@ export interface InventoryFilters {
 }
 
 export interface InventoryAdjustmentData {
-  storeId: string;
   itemId: string;
   locationId: string;
   quantityBefore: number;
@@ -32,7 +31,6 @@ export interface InventoryAdjustmentData {
 }
 
 export interface InventoryLocationData {
-  storeId: string;
   itemId: string;
   locationId: string;
   onHand: number;
@@ -123,13 +121,12 @@ export class InventoryService {
       }
 
       const timestamp = new Date();
-      const locationKey = `${data.storeId}-${data.itemId}-${data.locationId}`;
+      const locationKey = `${data.itemId}-${data.locationId}`;
 
       // Calculate available quantity
       const available = data.onHand - (data.committed || 0) - (data.unavailable || 0);
 
       const inventoryLocation = {
-        storeId: data.storeId,
         itemId: data.itemId,
         locationId: data.locationId,
         onHand: data.onHand,
@@ -173,7 +170,6 @@ export class InventoryService {
 
       const adjustment = {
         id: adjustmentId,
-        storeId: data.storeId,
         itemId: data.itemId,
         locationId: data.locationId,
         quantityBefore: data.quantityBefore,
@@ -195,7 +191,7 @@ export class InventoryService {
       };
 
       // Update inventory location
-      const locationKey = `${data.storeId}-${data.itemId}-${data.locationId}`;
+      const locationKey = `${data.itemId}-${data.locationId}`;
       const locationUpdate = {
         onHand: data.quantityAfter,
         updatedAt: timestamp,
@@ -220,7 +216,6 @@ export class InventoryService {
 
   // Perform cycle count with variance tracking
   async performCycleCount(
-    storeId: string,
     itemId: string,
     locationId: string,
     countedQuantity: number,
@@ -229,10 +224,10 @@ export class InventoryService {
     notes?: string
   ): Promise<{ success: boolean; adjustmentId?: string; variance?: number; error?: string }> {
     try {
-      log.info('Performing cycle count', 'InventoryService', { storeId, itemId, locationId, countedQuantity });
+      log.info('Performing cycle count', 'InventoryService', { itemId, locationId, countedQuantity });
 
       // Get current inventory level
-      const locationKey = `${storeId}-${itemId}-${locationId}`;
+      const locationKey = `${itemId}-${locationId}`;
       // In a real implementation, you would query the current inventory level
       // For now, we'll assume it's passed or retrieved from the database
       const currentQuantity = 0; // This should be retrieved from the database
@@ -242,7 +237,6 @@ export class InventoryService {
       if (variance !== 0) {
         // Record adjustment for the variance
         const adjustmentData: InventoryAdjustmentData = {
-          storeId,
           itemId,
           locationId,
           quantityBefore: currentQuantity,
@@ -292,14 +286,13 @@ export class InventoryService {
         return { success: true, variance: 0 };
       }
     } catch (error) {
-      trackError(error as Error, 'InventoryService', { operation: 'performCycleCount', storeId, itemId, locationId });
+      trackError(error as Error, 'InventoryService', { operation: 'performCycleCount', itemId, locationId });
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   }
 
   // Transfer inventory between locations
   async transferInventory(
-    storeId: string,
     itemId: string,
     fromLocationId: string,
     toLocationId: string,
@@ -310,8 +303,8 @@ export class InventoryService {
     notes?: string
   ): Promise<{ success: boolean; transferId?: string; error?: string }> {
     try {
-      log.info('Transferring inventory', 'InventoryService', { 
-        storeId, itemId, fromLocationId, toLocationId, quantity 
+      log.info('Transferring inventory', 'InventoryService', {
+        itemId, fromLocationId, toLocationId, quantity
       });
 
       const transferId = id();
@@ -328,7 +321,6 @@ export class InventoryService {
 
       // Record outgoing adjustment
       const outgoingAdjustment: InventoryAdjustmentData = {
-        storeId,
         itemId,
         locationId: fromLocationId,
         quantityBefore: fromCurrentQuantity,
@@ -344,7 +336,6 @@ export class InventoryService {
 
       // Record incoming adjustment
       const incomingAdjustment: InventoryAdjustmentData = {
-        storeId,
         itemId,
         locationId: toLocationId,
         quantityBefore: toCurrentQuantity,
@@ -372,7 +363,7 @@ export class InventoryService {
       log.info('Inventory transfer completed successfully', 'InventoryService', { transferId });
       return { success: true, transferId };
     } catch (error) {
-      trackError(error as Error, 'InventoryService', { operation: 'transferInventory', storeId, itemId });
+      trackError(error as Error, 'InventoryService', { operation: 'transferInventory', itemId });
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   }

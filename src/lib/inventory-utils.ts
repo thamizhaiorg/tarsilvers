@@ -5,9 +5,8 @@
 
 import { AppSchema } from '../../instant.schema';
 
-// Type definitions for enhanced inventory tracking
+// Type definitions for enhanced inventory tracking (simplified for single-store)
 export interface InventoryLocationData {
-  storeId: string;
   itemId: string;
   locationId: string;
   onHand?: number;

@@ -13,7 +13,6 @@ import { AuditValidation, AuditFormatting } from '../lib/audit-utils';
 import type { AppSchema } from '../../instant.schema';
 
 interface UseInventoryAuditOptions {
-  storeId: string;
   userId?: string;
   userName?: string;
   userRole?: UserRole;
@@ -52,13 +51,11 @@ export function useInventoryAudit(options: UseInventoryAuditOptions) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Query recent audit records for this store
+  // Query recent audit records (no store filtering needed)
   const { data: auditRecords, isLoading: auditLoading } = useQuery({
     iadjust: {
       $: {
-        where: {
-          storeId: options.storeId,
-        },
+        where: {},
         order: {
           serverCreatedAt: 'desc',
         },
@@ -67,12 +64,11 @@ export function useInventoryAudit(options: UseInventoryAuditOptions) {
     },
   });
 
-  // Query active sessions
+  // Query active sessions (no store filtering needed)
   const { data: activeSessions } = useQuery({
     audit_sessions: {
       $: {
         where: {
-          storeId: options.storeId,
           isActive: true,
         },
       },

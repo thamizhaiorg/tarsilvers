@@ -66,10 +66,9 @@ export default function EditItemLocations({ item, itemLocations, onClose }: Edit
 
   useEffect(() => {
     loadData();
-  }, [currentStore]);
+  }, []); // No dependency on currentStore since it no longer exists
 
   const loadData = async () => {
-    if (!currentStore) return;
 
     try {
       setLoading(true);

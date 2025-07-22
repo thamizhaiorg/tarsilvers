@@ -20,33 +20,29 @@ interface ProductItem {
 }
 
 export default function ProductSelect({ collectionId, onClose }: ProductSelectProps) {
-  const { currentStore } = useStore();
   const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
 
   // Query all products with optimized schema
-  const { isLoading, error, data } = db.useQuery(
-    currentStore?.id ? {
-      products: {
-        $: { 
-          where: { 
-            storeId: currentStore.id,
-            status: 'active' // Filter for active products only
-          },
-          order: {
-            title: 'asc' // Use indexed field for ordering
-          }
+  const { isLoading, error, data } = db.useQuery({
+    products: {
+      $: {
+        where: {
+          status: 'active' // Filter for active products only
         },
-        collection: {},
-        brand: {}, // Include relationship data
-        category: {},
-        type: {},
-        vendor: {}
-      }
-    } : {}
-  );
+        order: {
+          title: 'asc' // Use indexed field for ordering
+        }
+      },
+      collection: {},
+      brand: {}, // Include relationship data
+      category: {},
+      type: {},
+      vendor: {}
+    }
+  });
 
   const products = data?.products || [];
   

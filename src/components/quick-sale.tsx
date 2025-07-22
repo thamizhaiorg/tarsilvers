@@ -45,7 +45,6 @@ interface QuickSaleProps {
 
 export default function QuickSale({ onClose, onOrderCreated }: QuickSaleProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -73,7 +72,6 @@ export default function QuickSale({ onClose, onOrderCreated }: QuickSaleProps) {
       vendor: {},
       $: {
         where: {
-          storeId: currentStore?.id || '',
           pos: true,
           status: 'active' // Filter for active products only
         },

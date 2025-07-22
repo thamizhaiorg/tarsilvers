@@ -14,7 +14,6 @@ interface ReportsScreenProps {
 }
 
 export default function ReportsScreen({ onOpenMenu, onClose }: ReportsScreenProps) {
-  const { currentStore } = useStore();
 
   // Handle back navigation
   useEffect(() => {

@@ -40,20 +40,16 @@ export default function VendorSelect({ selectedVendor, onSelect, onClose }: Vend
   }, [onClose]);
 
   // Query vendors from database with optimized schema
-  const { isLoading, error, data } = db.useQuery(
-    currentStore?.id ? {
-      vendors: {
-        $: {
-          where: {
-            storeId: currentStore.id
-          },
-          order: {
-            name: 'asc' // Use indexed field for ordering
-          }
+  const { isLoading, error, data } = db.useQuery({
+    vendors: {
+      $: {
+        where: {}, // No store filtering needed
+        order: {
+          name: 'asc' // Use indexed field for ordering
         }
       }
-    } : null
-  );
+    }
+  });
 
   const vendors = data?.vendors || [];
 

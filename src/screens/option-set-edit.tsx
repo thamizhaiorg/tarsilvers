@@ -25,7 +25,6 @@ interface OptionSetEditScreenProps {
 }
 
 export default function OptionSetEditScreen({ setId, setName, onClose }: OptionSetEditScreenProps) {
-  const { currentStore } = useStore();
   const insets = useSafeAreaInsets();
   const isNewSet = setId === 'new';
 
@@ -40,9 +39,9 @@ export default function OptionSetEditScreen({ setId, setName, onClose }: OptionS
 
   // Load existing data
   const { data } = db.useQuery(
-    !isNewSet && currentStore?.id && setId ? {
+    !isNewSet && setId ? {
       opsets: {
-        $: { where: { id: setId, storeId: currentStore.id } }
+        $: { where: { id: setId } } // No store filtering needed
       },
       opvalues: {
         $: { where: { setId: setId } }
@@ -66,28 +65,23 @@ export default function OptionSetEditScreen({ setId, setName, onClose }: OptionS
   // Load last selected group from storage or set to first group
   useEffect(() => {
     const loadLastSelectedGroup = async () => {
-      if (currentStore?.id) {
-        try {
-          const key = `last_selected_group_${currentStore.id}`;
-          const lastGroup = await AsyncStorage.getItem(key);
-          if (lastGroup) {
-            setCurrentGroup(lastGroup);
-          } else {
-            // Default to first group (Group 1)
-            setCurrentGroup('Group 1');
-          }
-        } catch (error) {
-      // ...removed debug log...
-          // Fallback to first group
+      try {
+        const key = `last_selected_group_default`; // Use default key since no store
+        const lastGroup = await AsyncStorage.getItem(key);
+        if (lastGroup) {
+          setCurrentGroup(lastGroup);
+        } else {
+          // Default to first group (Group 1)
           setCurrentGroup('Group 1');
         }
-      } else {
-        // If no store, default to first group
+      } catch (error) {
+        // ...removed debug log...
+        // Fallback to first group
         setCurrentGroup('Group 1');
       }
     };
     loadLastSelectedGroup();
-  }, [currentStore?.id]);
+  }, []); // No dependency on currentStore since it no longer exists
 
   useEffect(() => {
     // Load option values when data is available
@@ -147,7 +141,7 @@ export default function OptionSetEditScreen({ setId, setName, onClose }: OptionS
       await db.transact([
         db.tx.opsets[setId].update({
           name: trimmedSetName,
-          storeId: currentStore.id,
+          // No storeId needed since schema doesn't include it
         })
       ]);
 
@@ -171,7 +165,7 @@ export default function OptionSetEditScreen({ setId, setName, onClose }: OptionS
             identifierValue: value.identifierValue,
             group: value.group,
             order: orderInGroup,
-            storeId: currentStore.id,
+            // No storeId needed since schema doesn't include it
             createdAt: Date.now(),
             updatedAt: Date.now(),
           });
@@ -214,13 +208,11 @@ export default function OptionSetEditScreen({ setId, setName, onClose }: OptionS
     setCurrentGroup(group);
 
     // Save selected group to storage
-    if (currentStore?.id) {
-      try {
-        const key = `last_selected_group_${currentStore.id}`;
-        await AsyncStorage.setItem(key, group);
-      } catch (error) {
-        // ...removed debug log...
-      }
+    try {
+      const key = `last_selected_group_default`; // Use default key since no store
+      await AsyncStorage.setItem(key, group);
+    } catch (error) {
+      // ...removed debug log...
     }
   };
 
@@ -385,7 +377,7 @@ export default function OptionSetEditScreen({ setId, setName, onClose }: OptionS
         <GroupManager
           currentGroup={currentGroup}
           onGroupSelect={handleGroupSelect}
-          storeId={currentStore?.id || ''}
+          storeId="default" // Use default since no store
           onGroupRenamed={handleGroupRenamed}
           initialGroups={actualGroupNames}
         />

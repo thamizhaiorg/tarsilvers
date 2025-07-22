@@ -85,16 +85,12 @@ export default function InventoryAdjustments({ onClose, onNavigate }: InventoryA
   }, [itemLocations, searchQuery]);
 
   const loadItemLocations = async () => {
-    if (!currentStore) return;
-
     try {
       setLoading(true);
       const result = await db.queryOnce({
         ilocations: {
           $: {
-            where: {
-              storeId: currentStore.id
-            }
+            where: {} // No store filtering needed
           },
           item: {
             product: {}

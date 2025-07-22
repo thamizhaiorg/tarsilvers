@@ -17,7 +17,6 @@ interface FileData {
   url: string;
   type: string;
   size: number;
-  storeId: string;
   reference?: string;
   createdAt: string;
   updatedAt?: string;
@@ -50,7 +49,6 @@ export default function FileUpload({
   className = '',
   style
 }: FileUploadProps) {
-  const { currentStore } = useStore();
   const { user } = db.useAuth();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -148,7 +146,6 @@ export default function FileUpload({
 
       // Use file manager for upload
       const uploadOptions = {
-        storeId: currentStore.id,
         userId: user.id,
         category: acceptedTypes === 'images' ? 'images' :
                  acceptedTypes === 'videos' ? 'videos' :
@@ -192,10 +189,29 @@ export default function FileUpload({
       ]).start();
 
     } catch (error) {
-      log.error('File upload failed', 'FileUpload', { error: error instanceof Error ? error.message : 'Unknown error' });
+      // Get R2 configuration status for debugging
+      const r2Status = r2Service.getConfigurationStatus();
+
+      log.error('File upload failed', 'FileUpload', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        fileName: file.name,
+        fileSize: file.size,
+        userId: user?.id,
+        hasUser: !!user,
+        r2ConfigValid: r2Status.isValid,
+        r2MissingFields: r2Status.missingFields
+      });
+
       const errorMessage = error instanceof Error ? error.message : 'Upload failed';
       onUploadError?.(errorMessage);
-      Alert.alert('Upload Failed', errorMessage);
+
+      // Show detailed error information including R2 status
+      const debugInfo = `File: ${file.name}\nSize: ${file.size} bytes\nUser: ${user?.id ? 'Authenticated' : 'Not authenticated'}\nR2 Config: ${r2Status.isValid ? 'Valid' : 'Invalid - Missing: ' + r2Status.missingFields.join(', ')}`;
+
+      Alert.alert(
+        'Upload Failed',
+        `${errorMessage}\n\n${debugInfo}`
+      );
     } finally {
       setUploading(false);
       setUploadProgress(0);

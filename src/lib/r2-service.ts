@@ -33,6 +33,36 @@ class R2Service {
     this.initializeClient();
   }
 
+  // Debug method to check configuration
+  getConfigurationStatus(): { isValid: boolean; missingFields: string[]; config: Partial<R2Config> } {
+    const missingFields: string[] = [];
+    const config: Partial<R2Config> = {};
+
+    // Check each required field
+    if (!r2Config.accountId) missingFields.push('accountId');
+    else config.accountId = r2Config.accountId.substring(0, 8) + '...'; // Show partial for security
+
+    if (!r2Config.accessKeyId) missingFields.push('accessKeyId');
+    else config.accessKeyId = r2Config.accessKeyId.substring(0, 8) + '...';
+
+    if (!r2Config.secretAccessKey) missingFields.push('secretAccessKey');
+    else config.secretAccessKey = '***';
+
+    if (!r2Config.bucketName) missingFields.push('bucketName');
+    else config.bucketName = r2Config.bucketName;
+
+    if (!r2Config.endpoint) missingFields.push('endpoint');
+    else config.endpoint = r2Config.endpoint;
+
+    config.region = r2Config.region;
+
+    return {
+      isValid: missingFields.length === 0,
+      missingFields,
+      config
+    };
+  }
+
   private initializeClient() {
     if (!validateR2Config()) {
       return;
@@ -52,10 +82,11 @@ class R2Service {
   async uploadFile(file: MediaFile, prefix: string = 'media'): Promise<UploadResult> {
     // Check client initialization
     if (!this.client) {
-      return { 
-        success: false, 
-        error: 'R2 client not initialized - check configuration', 
-        errorType: UploadErrorType.CONFIGURATION 
+      const configValid = validateR2Config();
+      return {
+        success: false,
+        error: `R2 client not initialized - ${configValid ? 'client initialization failed' : 'configuration missing or invalid'}`,
+        errorType: UploadErrorType.CONFIGURATION
       };
     }
 

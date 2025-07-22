@@ -70,27 +70,23 @@ export default function Metafields({ productId, onClose, showHeader = true }: Me
     return () => backHandler.remove();
   }, [onClose]);
 
-  // Query metafield definitions for this store (using special parentid for definitions)
-  const { data: metafieldsData } = db.useQuery(
-    currentStore?.id ? {
-      metasets: {
-        $: {
-          where: {
-            storeId: currentStore.id,
-            parentid: 'metafield-definitions' // Special parentid for definitions
-          }
+  // Query metafield definitions (using special parentid for definitions)
+  const { data: metafieldsData } = db.useQuery({
+    metasets: {
+      $: {
+        where: {
+          parentid: 'metafield-definitions' // Special parentid for definitions
         }
       }
-    } : {}
-  );
+    }
+  });
 
   // Query metafield values for this product
   const { data: valuesData } = db.useQuery(
-    productId && currentStore?.id ? {
+    productId ? {
       metasets: {
         $: {
           where: {
-            storeId: currentStore.id,
             parentid: productId
           }
         }

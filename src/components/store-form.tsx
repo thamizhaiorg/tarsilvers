@@ -14,7 +14,7 @@ interface StoreFormProps {
 
 export default function StoreForm({ store, onClose, onSave }: StoreFormProps) {
   const insets = useSafeAreaInsets();
-  const { createStore, updateStore } = useStore();
+  // Store creation/editing is no longer available since stores are not in the schema
   const isEditing = !!store;
 
   const [formData, setFormData] = useState({
@@ -40,28 +40,9 @@ export default function StoreForm({ store, onClose, onSave }: StoreFormProps) {
   }, [onClose]);
 
   const handleSave = async () => {
-    if (!formData.name.trim()) {
-      Alert.alert('Error', 'Store name is required');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      if (isEditing) {
-        await updateStore(store.id, formData);
-        Alert.alert('Success', 'Store updated successfully');
-      } else {
-        await createStore(formData);
-        Alert.alert('Success', 'Store created successfully');
-      }
-      onSave?.();
-      onClose();
-    } catch (error) {
-      console.error('Save error:', error);
-      Alert.alert('Error', 'Failed to save store');
-    } finally {
-      setLoading(false);
-    }
+    // Store creation/editing is no longer available
+    Alert.alert('Unavailable', 'Store management is no longer available in this version.');
+    onClose();
   };
 
   return (

@@ -64,7 +64,6 @@ export default function OrderProductSelect({ onProductsSelect, onClose }: OrderP
       vendor: {},
       $: {
         where: {
-          storeId: currentStore?.id || '',
           pos: true, // Only show POS-enabled products
           status: 'active' // Filter for active products only
         },

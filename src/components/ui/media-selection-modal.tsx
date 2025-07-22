@@ -21,7 +21,6 @@ interface MediaItem {
   size: number;
   reference?: string;
   dateAdded: Date;
-  storeId: string;
   userId?: string;
 }
 
@@ -45,7 +44,6 @@ export default function MediaSelectionModal({
   // console.log('📱 MEDIA MODAL: Component rendered', { visible, reference });
 
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const { user } = db.useAuth();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -110,8 +108,8 @@ export default function MediaSelectionModal({
   };
 
   const handleUpload = async () => {
-    if (!currentStore || !user) {
-      Alert.alert('Error', 'Please ensure you are logged in and have a store selected');
+    if (!user) {
+      Alert.alert('Error', 'Please ensure you are logged in');
       return;
     }
 

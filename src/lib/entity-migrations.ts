@@ -71,12 +71,12 @@ export async function migrateProducts(storeId: string, batchSize: number = 100):
 /**
  * Migrate orders entity
  */
-export async function migrateOrders(storeId: string, batchSize: number = 100): Promise<MigrationProgress> {
-  // Fetch all orders for the store
+export async function migrateOrders(batchSize: number = 100): Promise<MigrationProgress> {
+  // Fetch all orders
   const { data } = await db.query({
-    orders: { $: { where: { storeId } } },
+    orders: {},
   });
-  
+
   const orders = data.orders || [];
   const progress = createMigrationProgress('orders', orders.length);
   
@@ -120,12 +120,12 @@ export async function migrateOrders(storeId: string, batchSize: number = 100): P
 /**
  * Migrate order items entity
  */
-export async function migrateOrderItems(storeId: string, batchSize: number = 100): Promise<MigrationProgress> {
-  // Fetch all order items for the store
+export async function migrateOrderItems(batchSize: number = 100): Promise<MigrationProgress> {
+  // Fetch all order items
   const { data } = await db.query({
-    orderitems: { $: { where: { storeId } } },
+    orderitems: {},
   });
-  
+
   const orderItems = data.orderitems || [];
   const progress = createMigrationProgress('orderitems', orderItems.length);
   
@@ -169,12 +169,12 @@ export async function migrateOrderItems(storeId: string, batchSize: number = 100
 /**
  * Migrate customers entity
  */
-export async function migrateCustomers(storeId: string, batchSize: number = 100): Promise<MigrationProgress> {
-  // Fetch all customers for the store
+export async function migrateCustomers(batchSize: number = 100): Promise<MigrationProgress> {
+  // Fetch all customers
   const { data } = await db.query({
-    customers: { $: { where: { storeId } } },
+    customers: {},
   });
-  
+
   const customers = data.customers || [];
   const progress = createMigrationProgress('customers', customers.length);
   
@@ -322,9 +322,9 @@ function consolidateOrderItemFields(orderItem: Record<string, any>): Record<stri
 }
 
 /**
- * Run complete migration for a store
+ * Run complete migration for all entities
  */
-export async function migrateStore(storeId: string): Promise<{
+export async function migrateAllEntities(): Promise<{
   products: MigrationProgress;
   orders: MigrationProgress;
   orderItems: MigrationProgress;
@@ -332,11 +332,11 @@ export async function migrateStore(storeId: string): Promise<{
   items: MigrationProgress;
 }> {
   const results = {
-    products: await migrateProducts(storeId),
-    orders: await migrateOrders(storeId),
-    orderItems: await migrateOrderItems(storeId),
-    customers: await migrateCustomers(storeId),
-    items: await migrateItems(storeId),
+    products: await migrateProducts(),
+    orders: await migrateOrders(),
+    orderItems: await migrateOrderItems(),
+    customers: await migrateCustomers(),
+    items: await migrateItems(),
   };
   
   // Print overall summary

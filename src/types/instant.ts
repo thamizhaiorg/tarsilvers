@@ -244,7 +244,6 @@ export interface ValidationResult {
 // Search and filter types specific to InstantDB
 export interface InstantDBFilters {
   products: {
-    storeId?: string;
     status?: string;
     pos?: boolean;
     website?: boolean;
@@ -257,9 +256,8 @@ export interface InstantDBFilters {
     sku?: string;
     barcode?: string;
   };
-  
+
   orders: {
-    storeId?: string;
     status?: string;
     paymentStatus?: string;
     fulfillmentStatus?: string;
@@ -268,16 +266,14 @@ export interface InstantDBFilters {
     orderNumber?: string;
     referenceId?: string;
   };
-  
+
   customers: {
-    storeId?: string;
     name?: string;
     email?: string;
     phone?: string;
   };
-  
+
   items: {
-    storeId?: string;
     productId?: string;
     sku?: string;
     barcode?: string;

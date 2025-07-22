@@ -14,7 +14,6 @@ interface WorkspaceProps {
 }
 
 export default function Workspace({ onNavigate, onClose }: WorkspaceProps) {
-  const { currentStore } = useStore();
   const [showStoreForm, setShowStoreForm] = useState(false);
   const [showComList, setShowComList] = useState(false);
   const [salesMetrics, setSalesMetrics] = useState({ totalSales: 0, orderCount: 0 });
@@ -27,9 +26,7 @@ export default function Workspace({ onNavigate, onClose }: WorkspaceProps) {
   const { data: ordersData } = db.useQuery({
     orders: {
       $: {
-        where: {
-          storeId: currentStore?.id || '',
-        },
+        where: {}, // No store filtering needed since schema doesn't include storeId
         order: {
           createdAt: 'desc' // Use consistent field naming and add ordering
         }
@@ -124,13 +121,13 @@ export default function Workspace({ onNavigate, onClose }: WorkspaceProps) {
               {/* Header */}
               <View className="mb-4">
                 <View className="flex-row items-center justify-start mb-3">
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     onPress={() => handleItemPress('store')}
                     className="px-3 py-1 border border-gray-300"
                     style={{ borderRadius: 6 }}
                   >
                     <Text className="text-green-800 text-sm">
-                      {currentStore?.name || 'Store A'}
+                      Single Store
                     </Text>
                   </TouchableOpacity>
                 </View>

@@ -61,23 +61,19 @@ export default function Overview({ onClose, onNavigate }: OverviewProps) {
 
   useEffect(() => {
     loadItems();
-  }, [currentStore]);
+  }, []); // No dependency on currentStore since it no longer exists
 
   useEffect(() => {
     filterItems();
   }, [items, searchQuery, selectedFilter]);
 
   const loadItems = async () => {
-    if (!currentStore) return;
-
     try {
       setLoading(true);
       const result = await db.queryOnce({
         items: {
           $: {
-            where: {
-              storeId: currentStore.id
-            }
+            where: {} // No store filtering needed
           },
           product: {},
           itemLocations: {

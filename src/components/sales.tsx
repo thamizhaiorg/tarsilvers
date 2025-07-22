@@ -34,7 +34,6 @@ interface SalesScreenProps {
 }
 
 export default function SalesScreen({}: SalesScreenProps) {
-  const { currentStore } = useStore();
   const insets = useSafeAreaInsets();
   const [currentView, setCurrentView] = useState<'dashboard' | 'orders' | 'create-order' | 'order-details'>('dashboard');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -60,9 +59,7 @@ export default function SalesScreen({}: SalesScreenProps) {
       orderitems: {},
       location: {}, // Use new location relationship
       $: {
-        where: {
-          storeId: currentStore?.id || '',
-        },
+        where: {}, // No store filtering needed since schema doesn't include storeId
         order: {
           createdAt: 'desc' // Use consistent field naming
         }

@@ -41,26 +41,22 @@ export default function MetafieldValues({
   }, [onClose]);
 
   // Query metafield sets for this category
-  const { data: definitionsData } = db.useQuery(
-    currentStore?.id ? {
-      metasets: {
-        $: {
-          where: {
-            storeId: currentStore.id,
-            category: entityType
-          }
+  const { data: definitionsData } = db.useQuery({
+    metasets: {
+      $: {
+        where: {
+          category: entityType
         }
       }
-    } : {}
-  );
+    }
+  });
 
   // Query metafield values for this specific entity
   const { data: valuesData } = db.useQuery(
-    currentStore?.id && entityId ? {
+    entityId ? {
       metavalues: {
         $: {
           where: {
-            storeId: currentStore.id,
             entityId: entityId,
             entityType: entityType
           }

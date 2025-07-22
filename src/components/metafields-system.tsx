@@ -50,17 +50,13 @@ export default function MetafieldsSystem({
   }, [selectedEntityType, entityId, onClose]);
 
   // Query metafield sets count for each category
-  const { data: metafieldsData } = db.useQuery(
-    currentStore?.id ? {
-      metasets: {
-        $: {
-          where: {
-            storeId: currentStore.id
-          }
-        }
+  const { data: metafieldsData } = db.useQuery({
+    metasets: {
+      $: {
+        where: {} // No store filtering needed
       }
-    } : {}
-  );
+    }
+  });
 
   // Update entity counts
   useEffect(() => {

@@ -32,7 +32,6 @@ const LocationContext = createContext<LocationContextType | undefined>(undefined
 export function LocationProvider({ children }: { children: ReactNode }) {
   const [currentLocation, setCurrentLocationState] = useState<Location | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { currentStore } = useStore();
 
   // Query all locations
   const { data, isLoading: queryLoading } = db.useQuery({
@@ -41,9 +40,9 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
   const locations = data?.locations || [];
 
-  // Auto-create default location for single store
+  // Auto-create default location
   useEffect(() => {
-    if (!queryLoading && currentStore && locations.length === 0 && !currentLocation) {
+    if (!queryLoading && locations.length === 0 && !currentLocation) {
       // No locations exist, create the default location
       const createDefaultLocation = async () => {
         try {
@@ -81,7 +80,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       });
     }
     setIsLoading(queryLoading);
-  }, [locations, currentLocation, queryLoading, currentStore]);
+  }, [locations, currentLocation, queryLoading]); // Removed currentStore dependency
 
   const setCurrentLocation = (location: Location) => {
     setCurrentLocationState(location);

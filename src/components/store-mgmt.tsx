@@ -11,9 +11,8 @@ interface StoreManagementProps {
 
 export default function StoreManagement({ onClose }: StoreManagementProps) {
   const insets = useSafeAreaInsets();
-  const { stores, currentStore, setCurrentStore } = useStore();
+  // Store management is no longer available since stores are not in the schema
   const [showForm, setShowForm] = useState(false);
-  const [editingStore, setEditingStore] = useState<any>(null);
 
   // Handle Android back button
   useEffect(() => {
@@ -21,7 +20,6 @@ export default function StoreManagement({ onClose }: StoreManagementProps) {
       // If store form is open, close it
       if (showForm) {
         setShowForm(false);
-        setEditingStore(null);
         return true;
       }
       // Otherwise close store management
@@ -32,29 +30,6 @@ export default function StoreManagement({ onClose }: StoreManagementProps) {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
     return () => backHandler.remove();
   }, [showForm, onClose]);
-
-  const getStoreInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const handleEditStore = (store: any) => {
-    setEditingStore(store);
-    setShowForm(true);
-  };
-
-  const handleStoreSelect = async (store: any) => {
-    try {
-      await setCurrentStore(store);
-      onClose(); // Close the manage stores screen after selection
-    } catch (error) {
-      console.error('Failed to switch store:', error);
-    }
-  };
 
   if (showForm) {
     return (
@@ -82,35 +57,14 @@ export default function StoreManagement({ onClose }: StoreManagementProps) {
         </TouchableOpacity>
       </View>
 
-      {/* Store List */}
-      <FlatList
-        data={stores}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => handleStoreSelect(item)}
-            onLongPress={() => handleEditStore(item)}
-            className={`px-4 py-4 border-b border-gray-100 ${
-              item.id === currentStore?.id ? 'bg-gray-50' : 'bg-white'
-            }`}
-          >
-            <View className="flex-row items-center">
-              {/* Store Info */}
-              <View className="flex-1">
-                <Text className={`text-base ${
-                  item.id === currentStore?.id ? 'font-medium text-blue-600' : 'font-normal text-gray-900'
-                }`}>
-                  {item.name}
-                </Text>
-              </View>
-
-              {/* Active Indicator */}
-              {item.id === currentStore?.id && (
-                <View className="w-2 h-2 bg-blue-500 rounded-full" />
-              )}
-            </View>
-          </TouchableOpacity>
-        )}
+      {/* Store management no longer available */}
+      <View className="flex-1 justify-center items-center p-8">
+        <Feather name="store" size={48} color="#9CA3AF" />
+        <Text className="text-lg font-medium text-gray-900 mt-4 mb-2">Store Management Unavailable</Text>
+        <Text className="text-gray-500 text-center">
+          Store management has been simplified. The app now operates as a single-store system.
+        </Text>
+      </View>
         ListEmptyComponent={
           <View className="p-8 items-center">
             <Text className="text-gray-500 text-center">

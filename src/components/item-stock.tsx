@@ -53,7 +53,6 @@ interface ItemStockProps {
 
 export default function ItemStock({ item, onClose, onSave }: ItemStockProps) {
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [itemLocations, setItemLocations] = useState<ItemLocation[]>([]);

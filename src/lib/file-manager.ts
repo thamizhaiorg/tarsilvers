@@ -13,12 +13,10 @@ export interface FileRecord {
   size: number;
   reference?: string;
   dateAdded: Date;
-  storeId: string;
   userId?: string;
 }
 
 export interface FileUploadOptions {
-  storeId: string;
   userId?: string;
   category: string;
   reference?: string;
@@ -61,7 +59,6 @@ export class FileManager {
       size: file.size || 0,
       reference: options.reference || '',
       dateAdded: getCurrentTimestamp(),
-      storeId: options.storeId,
       ...(options.userId && { userId: options.userId })
     };
 
@@ -78,6 +75,15 @@ export class FileManager {
   // Upload a new file and create database record
   async uploadFile(file: any, options: FileUploadOptions): Promise<{ success: boolean; fileRecord?: FileRecord; error?: string }> {
     try {
+      // Validate inputs
+      if (!file || !file.uri) {
+        return { success: false, error: 'Invalid file provided' };
+      }
+
+      if (!options.userId) {
+        return { success: false, error: 'User ID is required for upload' };
+      }
+
       // Upload to R2 with structured path
       const uploadResult = await r2Service.uploadFileWithStructuredPath(
         file,
@@ -95,22 +101,28 @@ export class FileManager {
 
       return { success: true, fileRecord };
     } catch (error) {
-      trackError(error as Error, 'FileManager', { fileName: file.name });
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Upload failed' 
+      trackError(error as Error, 'FileManager', {
+        fileName: file.name,
+        fileSize: file.size,
+        userId: options.userId,
+        category: options.category,
+        reference: options.reference
+      });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Upload failed'
       };
     }
   }
 
   // Replace an existing file
   async replaceFile(
-    newFile: any, 
+    newFile: any,
     options: FileReplaceOptions
   ): Promise<{ success: boolean; fileRecord?: FileRecord; error?: string }> {
     try {
-      // Get existing file record
-      const { data: existingData } = await db.useQuery({
+      // Get existing file record using queryOnce instead of useQuery
+      const existingData = await db.queryOnce({
         files: {
           $: { where: { id: options.existingFileId } }
         }
@@ -177,7 +189,7 @@ export class FileManager {
   }
 
   // Get files by reference (static method for use outside React components)
-  async getFilesByReference(reference: string, storeId: string): Promise<FileRecord[]> {
+  async getFilesByReference(reference: string): Promise<FileRecord[]> {
     try {
       // Since we can't use useQuery outside React components, we'll need to implement this differently
       // For now, return empty array - this would need to be called from within a React component
@@ -190,7 +202,7 @@ export class FileManager {
   }
 
   // Check if a file is referenced by any entity
-  async isFileReferenced(fileId: string, storeId: string): Promise<boolean> {
+  async isFileReferenced(fileId: string): Promise<boolean> {
     try {
       // For now, always return true to prevent accidental deletion
       // This would need to be implemented with proper database queries
@@ -204,10 +216,10 @@ export class FileManager {
   }
 
   // Safe delete - only delete if not referenced
-  async safeDeleteFile(fileId: string, storeId: string): Promise<{ success: boolean; error?: string }> {
+  async safeDeleteFile(fileId: string): Promise<{ success: boolean; error?: string }> {
     try {
       // Check if file is referenced
-      const isReferenced = await this.isFileReferenced(fileId, storeId);
+      const isReferenced = await this.isFileReferenced(fileId);
       if (isReferenced) {
         return { 
           success: false, 
@@ -246,10 +258,10 @@ export class FileManager {
   }
 
   // Cleanup unreferenced files (maintenance operation)
-  async cleanupUnreferencedFiles(storeId: string): Promise<{ 
-    deletedCount: number; 
-    errors: string[]; 
-    skippedCount: number 
+  async cleanupUnreferencedFiles(): Promise<{
+    deletedCount: number;
+    errors: string[];
+    skippedCount: number
   }> {
     let deletedCount = 0;
     let skippedCount = 0;
@@ -262,10 +274,10 @@ export class FileManager {
 
       for (const file of files) {
         try {
-          const isReferenced = await this.isFileReferenced(file.id, storeId);
-          
+          const isReferenced = await this.isFileReferenced(file.id);
+
           if (!isReferenced) {
-            const result = await this.safeDeleteFile(file.id, storeId);
+            const result = await this.safeDeleteFile(file.id);
             if (result.success) {
               deletedCount++;
             } else {
@@ -287,7 +299,7 @@ export class FileManager {
 
       return { deletedCount, errors, skippedCount };
     } catch (error) {
-      trackError(error as Error, 'FileManager', { storeId });
+      trackError(error as Error, 'FileManager');
       return { 
         deletedCount, 
         errors: [error instanceof Error ? error.message : 'Cleanup failed'], 

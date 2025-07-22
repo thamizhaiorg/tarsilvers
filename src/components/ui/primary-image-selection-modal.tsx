@@ -21,7 +21,6 @@ interface MediaItem {
   size: number;
   reference?: string;
   dateAdded: Date;
-  storeId: string;
   userId?: string;
 }
 
@@ -43,7 +42,6 @@ export default function PrimaryImageSelectionModal({
   // log.debug('Component rendered', 'PrimaryImageSelectionModal', { visible, reference });
 
   const insets = useSafeAreaInsets();
-  const { currentStore } = useStore();
   const { user } = db.useAuth();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -86,8 +84,8 @@ export default function PrimaryImageSelectionModal({
   };
 
   const handleUpload = async () => {
-    if (!user || !currentStore) {
-      Alert.alert('Error', 'Please ensure you are logged in and have selected a store');
+    if (!user) {
+      Alert.alert('Error', 'Please ensure you are logged in');
       return;
     }
 

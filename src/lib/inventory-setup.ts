@@ -4,7 +4,6 @@ import { log, trackError } from './logger';
 
 export interface Location {
   id: string;
-  storeId: string;
   name: string;
   type: string;
   isDefault: boolean;
@@ -18,7 +17,6 @@ export interface ItemLocation {
   id: string;
   itemId: string;
   locationId: string;
-  storeId: string;
   onHand: number;
   committed: number;
   unavailable: number;
@@ -28,19 +26,13 @@ export interface ItemLocation {
 }
 
 /**
- * Creates a default location for a store if it doesn't exist
+ * Creates a default location if it doesn't exist (simplified for single-store system)
  */
-export async function createDefaultLocation(storeId: string, storeName?: string): Promise<string> {
+export async function createDefaultLocation(locationId?: string, locationName?: string): Promise<string> {
   try {
-    // Check if any location already exists for this store
+    // Check if any location already exists
     const existingLocations = await db.queryOnce({
-      locations: {
-        $: {
-          where: {
-            storeId: storeId
-          }
-        }
-      }
+      locations: {}
     });
 
     // If any location exists, return the first one (or the default one)
@@ -50,12 +42,11 @@ export async function createDefaultLocation(storeId: string, storeName?: string)
     }
 
     // Create default location only if none exists
-    const locationId = id();
+    const newLocationId = locationId || id();
     const timestamp = new Date().toISOString();
 
     const locationData = {
-      storeId,
-      name: storeName ? `${storeName} - Main Location` : 'Main Location',
+      name: locationName || 'Main Location',
       type: 'warehouse',
       isDefault: true,
       isActive: true,
@@ -65,24 +56,18 @@ export async function createDefaultLocation(storeId: string, storeName?: string)
     };
 
     await db.transact([
-      db.tx.locations[locationId].update(locationData)
+      db.tx.locations[newLocationId].update(locationData)
     ]);
 
     // ...removed debug log...
-    return locationId;
+    return newLocationId;
   } catch (error) {
     // ...removed debug log...
 
     // If creation fails, try to find any existing location
     try {
       const fallbackLocations = await db.queryOnce({
-        locations: {
-          $: {
-            where: {
-              storeId: storeId
-            }
-          }
-        }
+        locations: {}
       });
 
       if (fallbackLocations.data.locations && fallbackLocations.data.locations.length > 0) {
@@ -97,24 +82,18 @@ export async function createDefaultLocation(storeId: string, storeName?: string)
 }
 
 /**
- * Migrates existing item stock data to the new location-based system
+ * Migrates existing item stock data to the new location-based system (simplified for single-store)
  */
-export async function migrateItemsToLocationSystem(storeId: string): Promise<void> {
+export async function migrateItemsToLocationSystem(): Promise<void> {
   try {
     // Migration log removed. Migration is complete.
 
-    // Get default location for the store
-    const defaultLocationId = await createDefaultLocation(storeId);
+    // Get default location
+    const defaultLocationId = await createDefaultLocation();
 
-    // Get all items for the store
+    // Get all items
     const items = await db.queryOnce({
-      items: {
-        $: {
-          where: {
-            storeId: storeId
-          }
-        }
-      }
+      items: {}
     });
 
     if (!items.data.items || items.data.items.length === 0) {
@@ -159,7 +138,6 @@ export async function migrateItemsToLocationSystem(storeId: string): Promise<voi
             db.tx.ilocations[itemLocationId].update({
               itemId: item.id,
               locationId: defaultLocationId,
-              storeId: storeId,
               onHand,
               committed,
               unavailable,
@@ -254,12 +232,11 @@ export async function updateItemTotals(itemId: string): Promise<void> {
 }
 
 /**
- * Creates an inventory adjustment record
+ * Creates an inventory adjustment record (simplified for single-store)
  */
 export async function createInventoryAdjustment(
   itemId: string,
   locationId: string,
-  storeId: string,
   quantityBefore: number,
   quantityAfter: number,
   type: string = 'adjustment',
@@ -274,7 +251,6 @@ export async function createInventoryAdjustment(
     const timestamp = new Date().toISOString();
 
     const adjustmentData = {
-      storeId,
       itemId,
       locationId,
       type,
@@ -298,15 +274,14 @@ export async function createInventoryAdjustment(
 }
 
 /**
- * Gets all locations for a store
+ * Gets all active locations
  */
-export async function getStoreLocations(storeId: string): Promise<Location[]> {
+export async function getActiveLocations(): Promise<Location[]> {
   try {
     const result = await db.queryOnce({
       locations: {
         $: {
           where: {
-            storeId: storeId,
             isActive: true
           }
         }
@@ -342,44 +317,20 @@ export async function getItemStock(itemId: string): Promise<ItemLocation[]> {
 }
 
 /**
- * Initializes inventory system for all stores
+ * Initializes inventory system (simplified for single-store)
  * This should be called once to set up the inventory system
  */
 export async function initializeInventorySystem(): Promise<void> {
   try {
-    // Get all stores
-    const storesResult = await db.queryOnce({
-      store: {}
-    });
+    // Create default location
+    await createDefaultLocation();
 
-    const stores = storesResult.data.store || [];
+    // Migrate existing items to location system
+    await migrateItemsToLocationSystem();
 
-    if (stores.length === 0) {
-      return;
-    }
-
-    let successCount = 0;
-    let errorCount = 0;
-
-    for (const store of stores) {
-      try {
-        // Create default location for the store
-        await createDefaultLocation(store.id, store.name);
-
-        // Migrate existing items to location system
-        await migrateItemsToLocationSystem(store.id);
-
-        successCount++;
-      } catch (storeError) {
-        errorCount++;
-        // Continue with other stores
-      }
-    }
-
-    log.info(`Inventory system initialization complete: ${successCount} successful, ${errorCount} failed`, 'InventorySetup', { successCount, errorCount });
+    // ...removed debug log...
   } catch (error) {
-    trackError(error as Error, 'InventorySetup', { operation: 'initializeInventorySystem' });
-    // Don't throw error to prevent app startup failure
-    log.warn('Inventory initialization failed but continuing app startup', 'InventorySetup');
+    // ...removed debug log...
+    throw error;
   }
 }

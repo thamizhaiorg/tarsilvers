@@ -31,7 +31,6 @@ export default function OptionValuesSelector({
   onClose,
   onGenerate
 }: OptionValuesSelector) {
-  const { currentStore } = useStore();
   const insets = useSafeAreaInsets();
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
   const [activeGroup, setActiveGroup] = useState<string>('');
@@ -50,9 +49,9 @@ export default function OptionValuesSelector({
 
   // Query option values for the current option set
   const { data: optionValuesData } = db.useQuery(
-    optionSet?.id && currentStore?.id ? {
+    optionSet?.id ? {
       opvalues: {
-        $: { where: { setId: optionSet.id, storeId: currentStore.id } }
+        $: { where: { setId: optionSet.id } } // No store filtering needed
       }
     } : {}
   );

@@ -3,22 +3,15 @@ import { useLocation } from '../lib/location-context';
 import { initializeSingleStore, getSingleStoreConfig } from '../lib/single-store-setup';
 
 /**
- * Hook for managing single store operations
- * Provides easy access to store and location data with initialization
+ * Hook for managing single store operations (simplified since stores are no longer in schema)
+ * Provides easy access to location data with initialization
  */
 export function useSingleStore() {
-  const { currentStore, isLoading: storeLoading, ...storeActions } = useStore();
+  const { isLoading: storeLoading } = useStore();
   const { currentLocation, isLoading: locationLoading, ...locationActions } = useLocation();
 
   const isLoading = storeLoading || locationLoading;
-  const isReady = !isLoading && currentStore && currentLocation;
-
-  /**
-   * Initialize the single store setup if needed
-   */
-  const initialize = async (config?: Parameters<typeof initializeSingleStore>[0]) => {
-    return await initializeSingleStore(config);
-  };
+  const isReady = !isLoading && currentLocation;
 
   /**
    * Get complete store configuration
@@ -28,27 +21,23 @@ export function useSingleStore() {
   };
 
   /**
-   * Check if the store is properly set up
+   * Check if the setup is properly configured
    */
   const isSetupComplete = () => {
-    return !!(currentStore && currentLocation);
+    return !!currentLocation;
   };
 
   return {
     // Current state
-    store: currentStore,
+    store: null, // No longer available
     location: currentLocation,
     isLoading,
     isReady,
-    
+
     // Setup utilities
-    initialize,
     getConfig,
     isSetupComplete,
-    
-    // Store actions
-    ...storeActions,
-    
+
     // Location actions
     ...locationActions
   };

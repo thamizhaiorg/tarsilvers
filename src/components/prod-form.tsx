@@ -62,7 +62,6 @@ interface ProductFormScreenProps {
 }
 
 export default function ProductFormScreen({ product, onClose, onSave, onNavigate, onHasChangesChange }: ProductFormScreenProps) {
-  const { currentStore } = useStore();
   const insets = useSafeAreaInsets();
   const isEditing = !!product;
 
@@ -86,35 +85,19 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
 
   const productCollection = productWithCollection?.products?.[0]?.collection as any;
 
-  // Query option sets and values for the current store
-  const { data: optionSetsData } = db.useQuery(
-    currentStore?.id ? {
-      opsets: {
-        $: { where: { storeId: currentStore.id } }
-      },
-      opvalues: {
-        $: { where: { storeId: currentStore.id } }
-      }
-    } : {}
-  );
+  // Query option sets and values
+  const { data: optionSetsData } = db.useQuery({
+    opsets: {},
+    opvalues: {}
+  });
 
   // Query all relationship entities for display names
-  const { data: relationshipData } = db.useQuery(
-    currentStore?.id ? {
-      types: {
-        $: { where: { storeId: currentStore.id } }
-      },
-      categories: {
-        $: { where: { storeId: currentStore.id } }
-      },
-      vendors: {
-        $: { where: { storeId: currentStore.id } }
-      },
-      brands: {
-        $: { where: { storeId: currentStore.id } }
-      }
-    } : {}
-  );
+  const { data: relationshipData } = db.useQuery({
+    types: {},
+    categories: {},
+    vendors: {},
+    brands: {}
+  });
 
   // Query items for the current product
   const { data: productItemsData } = db.useQuery(
@@ -126,18 +109,15 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
   );
 
   // Query metafield definitions for products
-  const { data: metafieldDefinitionsData } = db.useQuery(
-    currentStore?.id ? {
-      metasets: {
-        $: {
-          where: {
-            storeId: currentStore.id,
-            category: 'products'
-          }
+  const { data: metafieldDefinitionsData } = db.useQuery({
+    metasets: {
+      $: {
+        where: {
+          category: 'products'
         }
       }
-    } : {}
-  );
+    }
+  });
 
 
 
@@ -186,7 +166,6 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
     featured: product?.featured ?? false,
     relproducts: product?.relproducts || null,
     sellproducts: product?.sellproducts || null,
-    storeId: product?.storeId || currentStore?.id || '', // Use current store ID
     status: product?.status ?? 'active', // 'active', 'draft', or 'archived'
   });
 
@@ -700,7 +679,7 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
   }, [formData, product, isInitializing, isDataLoaded]);
 
   const generateItemsFromOptionSets = async (optionSetNames: string[]) => {
-    if (!product?.id || !currentStore?.id) {
+    if (!product?.id) {
       Alert.alert('Error', 'Product must be saved before generating items');
       return;
     }
@@ -788,7 +767,6 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
         // Create item data with up to 3 options
         const itemData: any = {
           productId: product.id,
-          storeId: currentStore.id,
           sku: itemSku,
           price: formData.price || 0,
           saleprice: formData.saleprice || 0,
@@ -813,7 +791,7 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
 
         // Create default location stock record
         try {
-          const defaultLocationId = await createDefaultLocation(currentStore.id, currentStore.name);
+          const defaultLocationId = await createDefaultLocation('default', 'Main Location');
           const itemLocationId = id();
           const timestamp = new Date().toISOString();
 
@@ -821,7 +799,6 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
             db.tx.ilocations[itemLocationId].update({
               itemId: itemId,
               locationId: defaultLocationId,
-              storeId: currentStore.id,
               onHand: 0,
               committed: 0,
               unavailable: 0,
@@ -853,7 +830,7 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
   };
 
   const generateItemsFromSelectedValues = async (selectedValues: any[], optionSetData: any) => {
-    if (!product?.id || !currentStore?.id) {
+    if (!product?.id) {
       Alert.alert('Error', 'Product must be saved before generating items');
       return;
     }
@@ -934,7 +911,6 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
         // Create item data with up to 3 options
         const itemData: any = {
           productId: product.id,
-          storeId: currentStore.id,
           sku: itemSku,
           price: formData.price || 0,
           saleprice: formData.saleprice || 0,
@@ -959,7 +935,7 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
 
         // Create default location stock record
         try {
-          const defaultLocationId = await createDefaultLocation(currentStore.id, currentStore.name);
+          const defaultLocationId = await createDefaultLocation('default', 'Main Location');
           const itemLocationId = id();
           const timestamp = new Date().toISOString();
 
@@ -967,7 +943,6 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
             db.tx.ilocations[itemLocationId].update({
               itemId: itemId,
               locationId: defaultLocationId,
-              storeId: currentStore.id,
               onHand: 0,
               committed: 0,
               unavailable: 0,
@@ -1043,10 +1018,10 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
   // Function to fix unlinked items
   const fixUnlinkedItems = async () => {
     try {
-      // Query all items for current store
+      // Query all items
       const { data: allItemsData } = await db.queryOnce({
         items: {
-          $: { where: { storeId: currentStore.id } },
+          $: { where: {} }, // No store filtering needed
           product: {}
         }
       });
@@ -1081,7 +1056,6 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
   };
 
   const generateSingleItem = async (productId: string, productTitle: string) => {
-    if (!currentStore?.id) return;
 
     try {
       // Check if items already exist for this product
@@ -1108,7 +1082,6 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
 
       const itemData = {
         productId: productId,
-        storeId: currentStore.id,
         sku: productPrefix,
         price: formData.price || 0,
         saleprice: formData.saleprice || 0,
@@ -1127,7 +1100,7 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
 
       // Create default location stock record
       try {
-        const defaultLocationId = await createDefaultLocation(currentStore.id, currentStore.name);
+        const defaultLocationId = await createDefaultLocation('default', 'Main Location');
         const itemLocationId = id();
         const timestamp = new Date().toISOString();
 
@@ -1135,7 +1108,6 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
           db.tx.ilocations[itemLocationId].update({
             itemId: itemId,
             locationId: defaultLocationId,
-            storeId: currentStore.id,
             onHand: 0,
             committed: 0,
             unavailable: 0,
@@ -1232,7 +1204,6 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
       const timestamp = getCurrentTimestamp();
       const productData: any = {
         // Required fields
-        storeId: currentStore.id,
         updatedAt: timestamp,
         ...(isEditing ? {} : { createdAt: timestamp }),
       };
