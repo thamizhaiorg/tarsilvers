@@ -18,7 +18,15 @@ const DEFAULT_CONFIG: SingleStoreConfig = {
   storeName: 'skj silversmith',
   storeDescription: 'Professional jewelry and silversmith store',
   locationName: 'Main Location',
-  defaultCategories: ['Jewelry', 'Silver Items', 'Custom Work'],
+  defaultCategories: [
+    'Chuttis',
+    'Earrings',
+    'Nose rings',
+    'Necklaces',
+    'Bracelets',
+    'Hipchains',
+    'Anklets'
+  ],
   defaultCollections: ['Featured', 'New Arrivals', 'Best Sellers']
 };
 
@@ -195,6 +203,62 @@ export async function resetSingleStore() {
     return {
       success: false,
       message: 'Failed to reset single store',
+      error
+    };
+  }
+}
+
+/**
+ * Update categories to the new jewelry-specific ones
+ * This can be called to migrate from old categories to the new jewelry categories
+ */
+export async function updateToJewelryCategories() {
+  const jewelryCategories = [
+    'Chuttis',
+    'Earrings',
+    'Nose rings',
+    'Necklaces',
+    'Bracelets',
+    'Hipchains',
+    'Anklets'
+  ];
+
+  try {
+    const { data: categories } = await db.queryOnce({ categories: {} });
+    const existingCategories = categories?.categories?.map(c => c.name) || [];
+
+    const categoriesToCreate = jewelryCategories.filter(
+      cat => !existingCategories.includes(cat)
+    );
+
+    if (categoriesToCreate.length > 0) {
+      const categoryTransactions = categoriesToCreate.map(categoryName => {
+        const categoryId = id();
+        return db.tx.categories[categoryId].update({
+          name: categoryName
+        });
+      });
+
+      await db.transact(categoryTransactions);
+      console.log(`Added jewelry categories: ${categoriesToCreate.join(', ')}`);
+      return {
+        success: true,
+        message: `Added ${categoriesToCreate.length} jewelry categories`,
+        categoriesAdded: categoriesToCreate
+      };
+    } else {
+      console.log('All jewelry categories already exist');
+      return {
+        success: true,
+        message: 'All jewelry categories already exist',
+        categoriesAdded: []
+      };
+    }
+  } catch (error) {
+    console.error('Error updating jewelry categories:', error);
+    return {
+      success: false,
+      message: 'Failed to update jewelry categories',
       error
     };
   }

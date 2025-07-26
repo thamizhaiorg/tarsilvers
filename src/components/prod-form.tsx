@@ -319,11 +319,21 @@ export default function ProductFormScreen({ product, onClose, onSave, onNavigate
     return null;
   }, [relationshipData?.types, productWithCollection?.products]);
 
+  // Static jewelry categories mapping
+  const JEWELRY_CATEGORIES_MAP = {
+    'chuttis': 'Chuttis',
+    'earrings': 'Earrings',
+    'nose-rings': 'Nose rings',
+    'necklaces': 'Necklaces',
+    'bracelets': 'Bracelets',
+    'hipchains': 'Hipchains',
+    'anklets': 'Anklets',
+  };
+
   const getCategoryName = useCallback((categoryId: string) => {
-    if (!categoryId || !relationshipData?.categories) return null;
-    const category = relationshipData.categories.find((c: any) => c.id === categoryId);
-    return category?.name || null;
-  }, [relationshipData?.categories]);
+    if (!categoryId) return null;
+    return JEWELRY_CATEGORIES_MAP[categoryId as keyof typeof JEWELRY_CATEGORIES_MAP] || null;
+  }, []);
 
   const getVendorName = useCallback((vendorId: string) => {
     if (!vendorId || !relationshipData?.vendors) return null;
